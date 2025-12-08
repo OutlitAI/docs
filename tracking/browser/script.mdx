@@ -1,0 +1,354 @@
+---
+title: "Script Tag Integration"
+description: "The fastest way to add tracking to any website"
+---
+
+## Overview
+
+The script tag integration is the simplest way to add Outlit tracking to your website. It works on any site—static HTML, WordPress, Webflow, or any other platform.
+
+## Installation
+
+Add this snippet before the closing `</body>` tag. This creates a lightweight stub that queues calls until the full SDK loads, ensuring zero impact on page load speed:
+
+```html
+<script>
+  !function(w,d,src,key,auto){
+    if(w.outlit&&w.outlit._loaded)return;
+    w.outlit=w.outlit||{_q:[]};
+    ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId"].forEach(function(m){
+      w.outlit[m]=w.outlit[m]||function(){w.outlit._q.push([m,[].slice.call(arguments)])};
+    });
+    var s=d.createElement("script");s.async=1;s.src=src;
+    s.dataset.publicKey=key;if(auto!==undefined)s.dataset.autoTrack=auto;
+    (d.body||d.head).appendChild(s);
+  }(window,document,"https://cdn.outlit.ai/outlit.js","pk_your_public_key");
+</script>
+```
+
+<Tip>
+  This snippet is safe to place anywhere on the page, including in the `<head>`. Calls to `outlit.track()` or `outlit.identify()` will be queued and processed once the SDK loads.
+</Tip>
+
+### Simple Version
+
+If you prefer a cleaner script tag and don't need to call tracking methods before the SDK loads:
+
+```html
+<script
+  src="https://cdn.outlit.ai/outlit.js"
+  data-public-key="pk_your_public_key"
+  async
+></script>
+```
+
+<ParamField path="data-public-key" type="string" required>
+  Your organization's public key. Find it in Settings → Website Tracking.
+</ParamField>
+
+<ParamField path="data-api-host" type="string">
+  Custom API host. Defaults to `https://app.outlit.ai`.
+</ParamField>
+
+<ParamField path="data-track-pageviews" type="string">
+  Set to `"false"` to disable automatic pageview tracking.
+</ParamField>
+
+<ParamField path="data-track-forms" type="string">
+  Set to `"false"` to disable automatic form capture.
+</ParamField>
+
+<ParamField path="data-auto-track" type="string">
+  Set to `"false"` to disable automatic tracking on load. Use this when you need to wait for user consent before tracking. Call `window.outlit.enableTracking()` after consent is obtained.
+</ParamField>
+
+## Consent Management
+
+If you're using a consent management platform (CMP) or need to wait for user consent before tracking, pass `false` as the last parameter to disable auto-tracking:
+
+```html
+<script>
+  !function(w,d,src,key,auto){
+    if(w.outlit&&w.outlit._loaded)return;
+    w.outlit=w.outlit||{_q:[]};
+    ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId"].forEach(function(m){
+      w.outlit[m]=w.outlit[m]||function(){w.outlit._q.push([m,[].slice.call(arguments)])};
+    });
+    var s=d.createElement("script");s.async=1;s.src=src;
+    s.dataset.publicKey=key;if(auto!==undefined)s.dataset.autoTrack=auto;
+    (d.body||d.head).appendChild(s);
+  }(window,document,"https://cdn.outlit.ai/outlit.js","pk_your_public_key",false);
+</script>
+
+<script>
+  // Called by your consent management tool when user accepts
+  function onConsentAccepted() {
+    window.outlit.enableTracking()
+  }
+</script>
+```
+
+Or with the simple script tag:
+
+```html
+<script
+  src="https://cdn.outlit.ai/outlit.js"
+  data-public-key="pk_your_public_key"
+  data-auto-track="false"
+  async
+></script>
+```
+
+### With Popular CMPs
+
+<Tabs>
+  <Tab title="Cookiebot">
+```javascript
+window.addEventListener('CookiebotOnAccept', function() {
+  // Check for marketing or analytics consent
+  if (Cookiebot.consent.marketing || Cookiebot.consent.analytics) {
+    window.outlit.enableTracking()
+  }
+})
+```
+  </Tab>
+  <Tab title="OneTrust">
+```javascript
+// OneTrust calls this when consent changes
+function OptanonWrapper() {
+  // C0002 = Analytics, C0004 = Targeting/Marketing
+  if (OnetrustActiveGroups.includes('C0004') || OnetrustActiveGroups.includes('C0002')) {
+    window.outlit.enableTracking()
+  }
+}
+```
+  </Tab>
+  <Tab title="Custom Banner">
+```javascript
+document.getElementById('accept-cookies').addEventListener('click', function() {
+  localStorage.setItem('cookie_consent', 'accepted')
+  window.outlit.enableTracking()
+})
+
+// Check on page load
+if (localStorage.getItem('cookie_consent') === 'accepted') {
+  window.outlit.enableTracking()
+}
+```
+  </Tab>
+</Tabs>
+
+### Check Tracking Status
+
+```javascript
+// Check if tracking is currently enabled
+if (window.outlit.isTrackingEnabled()) {
+  console.log('Tracking is active')
+}
+```
+
+## Automatic Tracking
+
+Once installed, the tracker automatically captures:
+
+### Pageviews
+
+Every page navigation is tracked, including:
+- Full URL and path
+- Page title
+- Referrer
+- UTM parameters (`utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`)
+
+<Info>
+  For single-page applications, the tracker automatically detects navigation via `pushState`, `replaceState`, and `popstate` events.
+</Info>
+
+### Form Submissions
+
+When a form is submitted, the tracker captures:
+- Form ID or name
+- All field values (except sensitive fields)
+
+**Automatically Removed Fields:**
+- Passwords (`password`, `passwd`, `pwd`)
+- Credit card numbers (`credit_card`, `cc_number`, `cvv`)
+- Social Security numbers (`ssn`, `social_security`)
+- API keys and tokens (`api_key`, `token`, `secret`)
+
+## Manual Tracking
+
+Use the global `window.outlit` object to track custom events:
+
+### Track Custom Events
+
+```javascript
+window.outlit.track('button_clicked', {
+  buttonId: 'cta-hero',
+  page: '/pricing'
+})
+
+window.outlit.track('video_played', {
+  videoId: 'demo-video',
+  duration: 120
+})
+```
+
+<ParamField path="eventName" type="string" required>
+  The name of the event. Use snake_case for consistency.
+</ParamField>
+
+<ParamField path="properties" type="object">
+  Optional properties to attach to the event.
+</ParamField>
+
+### Identify Visitors
+
+When a visitor provides their email (signup, login, contact form), identify them:
+
+```javascript
+window.outlit.identify({
+  email: 'jane@example.com',
+  userId: 'usr_12345', // optional
+  traits: {
+    name: 'Jane Doe',
+    company: 'Acme Inc',
+    plan: 'enterprise'
+  }
+})
+```
+
+<ParamField path="email" type="string">
+  The visitor's email address.
+</ParamField>
+
+<ParamField path="userId" type="string">
+  Your internal user ID (from Supabase, Auth0, Firebase, etc.).
+</ParamField>
+
+<ParamField path="traits" type="object">
+  Additional properties about the user.
+</ParamField>
+
+<Warning>
+  At least one of `email` or `userId` should be provided. Without identity information, the call has no effect.
+</Warning>
+
+### Get Visitor ID
+
+Access the current visitor's ID (useful for server-side correlation):
+
+```javascript
+const visitorId = window.outlit.getVisitorId()
+// Returns: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```
+
+## Queued Commands
+
+The tracker supports commands even before it fully loads. Commands are queued and executed once ready:
+
+```html
+<script>
+  // This works even before the script loads
+  window.outlit = window.outlit || { _queue: [] };
+  window.outlit.track('early_event', { page: 'landing' });
+</script>
+
+<script
+  src="https://cdn.outlit.ai/outlit.js"
+  data-public-key="pk_xxx"
+  async
+></script>
+```
+
+## Event Batching
+
+For performance, events are batched and sent:
+- Every 5 seconds (if there are pending events)
+- When the queue reaches 10 events
+- When the page is about to unload (using `sendBeacon`)
+
+## Example: Full Integration
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Website</title>
+</head>
+<body>
+  <h1>Welcome</h1>
+  
+  <form id="contact-form">
+    <input name="email" type="email" placeholder="Email" />
+    <input name="name" type="text" placeholder="Name" />
+    <button type="submit">Contact Us</button>
+  </form>
+
+  <button id="cta" onclick="handleCTA()">Get Started</button>
+
+  <script>
+    function handleCTA() {
+      window.outlit.track('cta_clicked', {
+        location: 'hero',
+        page: window.location.pathname
+      });
+    }
+
+    // Identify after form submission
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      const email = e.target.querySelector('[name="email"]').value;
+      const name = e.target.querySelector('[name="name"]').value;
+      
+      window.outlit.identify({
+        email: email,
+        traits: { name: name }
+      });
+    });
+  </script>
+
+  <script
+    src="https://cdn.outlit.ai/outlit.js"
+    data-public-key="pk_your_public_key"
+    async
+  ></script>
+</body>
+</html>
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Events not appearing in dashboard">
+    1. Check your public key is correct
+    2. Verify the domain is in your allowlist (Settings → Website Tracking)
+    3. Open DevTools → Network and check for errors in `/api/i/v1/` requests
+    4. Ensure the script loads without errors (check Console)
+  </Accordion>
+  
+  <Accordion title="Form data not captured">
+    1. Form must have a submit event (not prevented with `e.preventDefault()` before capture)
+    2. Check if field names match the denylist (they may be filtered for security)
+    3. Ensure `data-track-forms` is not set to `"false"`
+  </Accordion>
+  
+  <Accordion title="Pageviews not tracking on SPA">
+    The tracker automatically listens for `pushState`/`replaceState`. If using a custom router that doesn't use these, manually track:
+    ```javascript
+    router.on('routeChange', (url) => {
+      window.outlit.track('pageview', { url });
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="NPM Package" icon="npm" href="/tracking/browser/npm">
+    Use the npm package for more control
+  </Card>
+  <Card title="React Integration" icon="react" href="/tracking/browser/react">
+    First-class React support with hooks
+  </Card>
+</CardGroup>
+

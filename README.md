@@ -1,44 +1,56 @@
-# Mintlify Starter Kit
+# Outlit Documentation
 
-Use the starter kit to get your docs deployed and ready to customize.
+This repository contains the documentation for Outlit - the customer journey platform.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+## Local Development
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+Install the [Mintlify CLI](https://www.npmjs.com/package/mintlify) to preview the documentation changes locally.
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
-
-## Development
-
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
-
-```
-npm i -g mint
+```bash
+npm i -g mintlify
 ```
 
-Run the following command at the root of your documentation, where your `docs.json` is located:
+Run the following command at the root of your documentation (where `docs.json` is):
+
+```bash
+mintlify dev
+```
+
+## Documentation Structure
 
 ```
-mint dev
+docs/
+├── index.mdx                    # Homepage
+├── tracking/
+│   ├── overview.mdx             # Tracking system overview
+│   ├── quickstart.mdx           # Quick start guide
+│   ├── browser/
+│   │   ├── script.mdx           # Script tag integration
+│   │   ├── npm.mdx              # NPM package
+│   │   └── react.mdx            # React integration
+│   ├── server/
+│   │   └── nodejs.mdx           # Node.js SDK
+│   └── identity/
+│       ├── overview.mdx         # Identity resolution
+│       └── anonymous-visitors.mdx
+└── api-reference/
+    ├── introduction.mdx         # API overview
+    └── ingest.mdx               # Ingest API docs
 ```
 
-View your local preview at `http://localhost:3000`.
+## Publishing Changes
 
-## Publishing changes
+Push changes to the `main` branch to automatically publish to production.
 
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
+## Adding New Pages
 
-## Need help?
+1. Create a new `.mdx` file in the appropriate directory
+2. Add frontmatter with `title` and `description`
+3. Add the page path to `docs.json` navigation
+4. Preview locally with `mintlify dev`
 
-### Troubleshooting
+## Resources
 
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
-- [Mintlify community](https://mintlify.com/community)
+- [Mintlify Documentation](https://mintlify.com/docs)
+- [MDX Syntax Reference](https://mintlify.com/docs/text)
+- [Component Reference](https://mintlify.com/docs/components)

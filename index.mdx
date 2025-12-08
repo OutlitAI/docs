@@ -1,97 +1,111 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Welcome to Outlit"
+description: "Track and understand your complete customer journey from anonymous visitor to paid customer"
 ---
 
-## Setting up
+## The Complete Customer Journey Platform
 
-Get your documentation site up and running in minutes.
+Outlit helps you understand how prospects discover, evaluate, and become customers. Track every touchpoint across websites, apps, and backend systems to build a complete picture of customer behavior.
 
 <Card
-  title="Start here"
+  title="Get Started with Tracking"
   icon="rocket"
-  href="/quickstart"
+  href="/tracking/quickstart"
   horizontal
 >
-  Follow our three step quickstart guide.
+  Set up customer journey tracking in under 5 minutes.
 </Card>
 
-## Make it yours
+## Why Outlit?
 
-Design a docs site that looks great and empowers your users.
+Traditional analytics tools show you what happened on your website. Outlit shows you the complete customer journey:
 
 <Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+  <Card title="Anonymous to Known" icon="user-plus">
+    Track visitors before they identify themselves, then seamlessly connect their history when they sign up or log in.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Cross-Platform" icon="arrows-to-circle">
+    Unify customer behavior across your website, app, and backend systems into a single timeline.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Identity Resolution" icon="fingerprint">
+    Automatically merge customer profiles when the same person uses different devices or emails.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Sales Intelligence" icon="chart-line">
+    Surface the signals that matter—see which prospects are actively evaluating before they reach out.
   </Card>
 </Columns>
 
-## Create beautiful pages
+## Choose Your Integration
 
-Everything you need to create world-class documentation.
+<Tabs>
+  <Tab title="Script Tag" icon="code">
+    The fastest way to start. Add a single script tag to your website.
+    
+    ```html
+    <script
+      src="https://cdn.outlit.ai/outlit.js"
+      data-public-key="pk_your_key"
+      async
+    ></script>
+    ```
+    
+    <Card title="Script Tag Guide" icon="arrow-right" href="/tracking/browser/script">
+      Learn more about script tag integration
+    </Card>
+  </Tab>
+  <Tab title="React" icon="react">
+    First-class React support with hooks and context.
+    
+    ```tsx
+    import { OutlitProvider } from '@outlit/tracker/react'
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+    export default function App({ children }) {
+      return (
+        <OutlitProvider publicKey="pk_your_key" trackPageviews>
+          {children}
+        </OutlitProvider>
+      )
+    }
+    ```
+    
+    <Card title="React Integration" icon="arrow-right" href="/tracking/browser/react">
+      Learn more about React integration
+    </Card>
+  </Tab>
+  <Tab title="Node.js" icon="node-js">
+    Server-side tracking for authenticated users.
+    
+    ```typescript
+    import { Outlit } from '@outlit/tracker-node'
 
-## Need inspiration?
+    const outlit = new Outlit({ publicKey: 'pk_your_key' })
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+    outlit.track({
+      email: 'user@example.com',
+      eventName: 'subscription_created',
+      properties: { plan: 'pro' }
+    })
+    ```
+    
+    <Card title="Node.js SDK" icon="arrow-right" href="/tracking/server/nodejs">
+      Learn more about server-side tracking
+    </Card>
+  </Tab>
+</Tabs>
+
+## How It Works
+
+<Steps>
+  <Step title="Install the Tracker">
+    Add our lightweight tracker to your website or app using a script tag, npm package, or React provider.
+  </Step>
+  <Step title="Track Events">
+    Automatically capture pageviews and form submissions, or manually track custom events that matter to your business.
+  </Step>
+  <Step title="Identify Visitors">
+    When visitors sign up or log in, call `identify()` to connect their anonymous history to their profile.
+  </Step>
+  <Step title="Analyze Journeys">
+    See the complete path from first touch to conversion, across devices and sessions.
+  </Step>
+</Steps>
