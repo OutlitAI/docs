@@ -115,6 +115,11 @@ These are captured automatically by the browser tracker:
 |-------|------|---------------|
 | `pageview` | Every navigation | URL, path, title, referrer, UTM |
 | `form` | Form submission | Form ID, field values (sanitized) |
+| `identify` | Form with email field | Email, name (auto-extracted) |
+
+<Tip>
+  **Auto-Identify:** When a form contains an email field, Outlit automatically calls `identify()` with the extracted email and name. This links the anonymous visitor to a known profile without any code. [Learn more](/tracking/identity/overview#auto-identify)
+</Tip>
 
 ### Manual Events
 

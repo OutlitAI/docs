@@ -3,6 +3,92 @@ title: "Identity Resolution"
 description: "How Outlit connects anonymous visitors to known customers"
 ---
 
+## Auto-Identify
+
+By default, Outlit **automatically identifies visitors** when they submit a form containing an email field—no code required.
+
+### How It Works
+
+When a form is submitted, Outlit:
+
+1. **Detects email** by looking for:
+   - Field names: `email`, `e-mail`, `user_email`, `emailAddress`
+   - Input type: `type="email"`
+   - Any field with a valid email value (fallback)
+
+2. **Extracts name** by looking for:
+   - Full name: `name`, `full_name`, `fullname`, `your_name`
+   - First name: `first_name`, `fname`, `firstname`, `given_name`
+   - Last name: `last_name`, `lname`, `surname`, `family_name`
+
+3. **Calls `identify()` automatically**:
+
+```typescript
+// This happens behind the scenes when a form with email is submitted
+identify({
+  email: 'jane@acme.com',
+  traits: {
+    name: 'Jane Doe',      // If full name found
+    firstName: 'Jane',     // If first name found
+    lastName: 'Doe'        // If last name found
+  }
+})
+```
+
+<Info>
+  The form submission event is still captured separately. Auto-identify adds an additional `identify` event when an email is found.
+</Info>
+
+### Supported Form Types
+
+Auto-identify works with common form patterns:
+
+| Form Type | Fields Detected |
+|-----------|-----------------|
+| Newsletter signup | `email` |
+| Contact form | `email`, `name`, `company` |
+| Demo request | `email`, `first_name`, `last_name`, `company` |
+| Lead magnet | `email`, `name` |
+| Account signup | `email`, `password` (password excluded from capture) |
+
+### Disabling Auto-Identify
+
+If you prefer to handle identification manually (e.g., for custom validation or delayed identification):
+
+<Tabs>
+  <Tab title="Script Tag">
+```html
+<script
+  src="https://cdn.outlit.ai/outlit.js"
+  data-public-key="pk_xxx"
+  data-auto-identify="false"
+  async
+></script>
+```
+  </Tab>
+  <Tab title="React">
+```tsx
+<OutlitProvider publicKey="pk_xxx" autoIdentify={false}>
+  {children}
+</OutlitProvider>
+```
+  </Tab>
+  <Tab title="NPM">
+```typescript
+outlit.init({
+  publicKey: 'pk_xxx',
+  autoIdentify: false
+})
+```
+  </Tab>
+</Tabs>
+
+<Warning>
+  When auto-identify is disabled, form submissions are still captured. Only the automatic `identify()` call is skipped. You'll need to call `identify()` manually when appropriate.
+</Warning>
+
+---
+
 ## The Identity Challenge
 
 Modern customers interact with your business across multiple touchpoints:

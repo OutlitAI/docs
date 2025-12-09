@@ -62,6 +62,10 @@ If you prefer a cleaner script tag and don't need to call tracking methods befor
   Set to `"false"` to disable automatic tracking on load. Use this when you need to wait for user consent before tracking. Call `window.outlit.enableTracking()` after consent is obtained.
 </ParamField>
 
+<ParamField path="data-auto-identify" type="string">
+  Set to `"false"` to disable automatic user identification from form submissions. When enabled (default), submitting a form with an email field automatically calls `identify()` with the extracted email and name. See [Auto-Identify](/tracking/identity/overview#auto-identify) for details.
+</ParamField>
+
 ## Consent Management
 
 If you're using a consent management platform (CMP) or need to wait for user consent before tracking, pass `false` as the last parameter to disable auto-tracking:

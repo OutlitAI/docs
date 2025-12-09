@@ -66,6 +66,10 @@ outlit.init({
   Whether to start tracking automatically on init. Set to `false` if you need to wait for user consent. Call `enableTracking()` after consent is obtained.
 </ParamField>
 
+<ParamField path="autoIdentify" type="boolean" default="true">
+  Automatically identify users when they submit forms containing an email field. Extracts email and name using field name heuristics. Set to `false` to call `identify()` manually. See [Auto-Identify](/tracking/identity/overview#auto-identify) for details.
+</ParamField>
+
 ## Consent Management
 
 If you need to wait for user consent before tracking:

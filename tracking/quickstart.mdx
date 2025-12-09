@@ -158,9 +158,12 @@ function LoginForm() {
 ```
 </CodeGroup>
 
-<Warning>
-  Always call `identify()` after a successful login or signup, not before. This ensures the visitor's anonymous history is properly linked to their profile.
-</Warning>
+<Info>
+  **Good news:** If your signup/login uses a standard HTML form with an email field, auto-identify handles this automatically! Manual `identify()` calls are only needed for:
+  - JavaScript-based auth (OAuth, magic links)
+  - Server-side authentication
+  - Adding additional traits after login
+</Info>
 
 ## What's Captured Automatically
 
@@ -170,7 +173,12 @@ With the default configuration, Outlit automatically captures:
 |-------|---------|------|
 | **Pageview** | Every navigation | URL, path, title, referrer, UTM params |
 | **Form Submit** | Form submission | Form ID, field values (sensitive fields removed) |
+| **Auto-Identify** | Form with email | Email + name extracted, visitor linked to profile |
 | **Session Start** | First visit | Landing page, referrer, UTM attribution |
+
+<Tip>
+  **Zero-code identification:** When a visitor submits a form with an email field (signup, contact, demo request), they're automatically identified and linked to a customer profile. No manual `identify()` call needed! [Learn more](/tracking/identity/overview#auto-identify)
+</Tip>
 
 ## Next Steps
 
