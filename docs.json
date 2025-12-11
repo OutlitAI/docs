@@ -26,7 +26,8 @@
 						"pages": [
 							"tracking/browser/script",
 							"tracking/browser/npm",
-							"tracking/browser/react"
+							"tracking/browser/react",
+							"tracking/browser/calendar-embeds"
 						]
 					},
 					{

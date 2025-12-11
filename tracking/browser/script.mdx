@@ -66,6 +66,10 @@ If you prefer a cleaner script tag and don't need to call tracking methods befor
   Set to `"false"` to disable automatic user identification from form submissions. When enabled (default), submitting a form with an email field automatically calls `identify()` with the extracted email and name. See [Auto-Identify](/tracking/identity/overview#auto-identify) for details.
 </ParamField>
 
+<ParamField path="data-track-calendar-embeds" type="string">
+  Set to `"false"` to disable automatic tracking of calendar bookings from Cal.com and Calendly embeds. See [Calendar Embed Tracking](/tracking/browser/calendar-embeds) for details.
+</ParamField>
+
 ## Consent Management
 
 If you're using a consent management platform (CMP) or need to wait for user consent before tracking, pass `false` as the last parameter to disable auto-tracking:
@@ -353,6 +357,9 @@ For performance, events are batched and sent:
   </Card>
   <Card title="React Integration" icon="react" href="/tracking/browser/react">
     First-class React support with hooks
+  </Card>
+  <Card title="Calendar Embeds" icon="calendar" href="/tracking/browser/calendar-embeds">
+    Track Cal.com and Calendly bookings
   </Card>
 </CardGroup>
 
