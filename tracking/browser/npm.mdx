@@ -32,6 +32,7 @@ outlit.init({
   apiHost: 'https://app.outlit.ai',
   trackPageviews: true,
   trackForms: true,
+  trackEngagement: true,
   flushInterval: 5000, // ms
 })
 ```
@@ -68,6 +69,18 @@ outlit.init({
 
 <ParamField path="autoIdentify" type="boolean" default="true">
   Automatically identify users when they submit forms containing an email field. Extracts email and name using field name heuristics. Set to `false` to call `identify()` manually. See [Auto-Identify](/tracking/identity/overview#auto-identify) for details.
+</ParamField>
+
+<ParamField path="trackEngagement" type="boolean" default="true">
+  Track engagement metrics (active time on page). Emits engagement events on page exit and SPA navigation capturing how long users actively engaged with each page.
+</ParamField>
+
+<ParamField path="idleTimeout" type="number" default="30000">
+  Idle timeout in milliseconds for engagement tracking. After this period of no user interaction, the user is considered idle and active time stops accumulating.
+</ParamField>
+
+<ParamField path="trackCalendarEmbeds" type="boolean" default="true">
+  Track booking events from calendar embeds (Cal.com, Calendly). Fires a calendar event when bookings are detected.
 </ParamField>
 
 ## Consent Management
@@ -160,6 +173,75 @@ outlit.identify({
   Additional properties about the user.
 </ParamField>
 
+### `outlit.setUser(identity)`
+
+Set the current user identity. Ideal for SPA applications where you know the user's identity after authentication. Can be called before tracking is enabled—the identity is queued and applied when `enableTracking()` is called.
+
+```typescript
+// After user logs in
+outlit.setUser({
+  email: 'jane@acme.com',
+  userId: 'usr_12345',
+  traits: {
+    name: 'Jane Doe',
+    plan: 'pro'
+  }
+})
+```
+
+<Info>
+  Both `setUser()` and `identify()` link the visitor to a known profile. The difference is `setUser()` can be called before tracking is enabled (identity is queued), while `identify()` requires tracking to be enabled first.
+</Info>
+
+### `outlit.clearUser()`
+
+Clear the current user identity. Call this when the user logs out.
+
+```typescript
+// On logout
+outlit.clearUser()
+```
+
+### Journey Stage Methods
+
+Track user progression through your product lifecycle. These require the user to be identified first (via `setUser()` or `identify()`).
+
+#### `outlit.activate(properties?)`
+
+Mark the current user as activated. Typically called after a user completes onboarding or a key activation milestone.
+
+```typescript
+outlit.activate({ flow: 'onboarding', step: 'completed' })
+```
+
+#### `outlit.engaged(properties?)`
+
+Mark the current user as engaged. Typically called when a user reaches a usage milestone.
+
+```typescript
+outlit.engaged({ milestone: 'first_project_created' })
+```
+
+#### `outlit.paid(properties?)`
+
+Mark the current user as paid. Typically called after a successful payment or subscription.
+
+```typescript
+outlit.paid({ plan: 'pro', amount: 99 })
+```
+
+#### `outlit.churned(properties?)`
+
+Mark the current user as churned. Typically called when a subscription is cancelled.
+
+```typescript
+outlit.churned({ reason: 'too_expensive' })
+```
+
+<Warning>
+  Stage methods require the user to be identified first. If called without a user identity, a warning is logged and the event is not sent.
+</Warning>
+
 ### `outlit.getInstance()`
 
 Get the singleton tracker instance.
@@ -203,9 +285,10 @@ The package is written in TypeScript and includes full type definitions:
 
 ```typescript
 import outlit, {
-  type TrackerOptions,
+  type OutlitOptions,
   type BrowserTrackOptions,
   type BrowserIdentifyOptions,
+  type UserIdentity,
 } from '@outlit/tracker'
 
 // Full type safety
@@ -330,6 +413,35 @@ fetch('/api/correlate', {
 })
 ```
 
+## Engagement Tracking
+
+Engagement tracking captures how long users actively spend on each page. It's enabled by default and works automatically.
+
+### How It Works
+
+- **Active time** is tracked when the page is visible and the user is interacting (mouse movement, clicks, scrolling, typing)
+- **Idle detection** pauses active time after 30 seconds of no interaction (configurable via `idleTimeout`)
+- **Engagement events** are automatically sent when the user navigates to a new page or leaves the site
+
+### Engagement Data
+
+Each engagement event includes:
+
+| Property | Description |
+|----------|-------------|
+| `activeTimeMs` | Time in milliseconds the user was actively engaged |
+| `totalTimeMs` | Total wall-clock time on the page |
+| `sessionId` | Session ID for grouping page views |
+
+### Disabling Engagement Tracking
+
+```typescript
+outlit.init({
+  publicKey: 'pk_xxx',
+  trackEngagement: false, // Disable engagement tracking
+})
+```
+
 ## Next Steps
 
 <CardGroup cols={2}>
@@ -340,4 +452,3 @@ fetch('/api/correlate', {
     Track events from your backend
   </Card>
 </CardGroup>
-

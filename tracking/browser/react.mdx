@@ -71,6 +71,7 @@ import { OutlitProvider } from '@outlit/tracker/react'
   apiHost="https://app.outlit.ai"
   trackPageviews={true}
   trackForms={true}
+  trackEngagement={true}
   formFieldDenylist={['custom_secret_field']}
   flushInterval={5000}
 >
@@ -111,6 +112,59 @@ import { OutlitProvider } from '@outlit/tracker/react'
 <ParamField path="autoIdentify" type="boolean" default="true">
   Automatically identify users when they submit forms containing an email field. Extracts email and name (first name, last name, full name) using field name heuristics. Set to `false` to disable and call `identify()` manually. See [Auto-Identify](/tracking/identity/overview#auto-identify) for details.
 </ParamField>
+
+<ParamField path="trackEngagement" type="boolean" default="true">
+  Track engagement metrics (active time on page). Emits engagement events on page exit and navigation.
+</ParamField>
+
+<ParamField path="idleTimeout" type="number" default="30000">
+  Idle timeout in milliseconds for engagement tracking. After this period of no user interaction, the user is considered idle.
+</ParamField>
+
+<ParamField path="trackCalendarEmbeds" type="boolean" default="true">
+  Track booking events from calendar embeds (Cal.com, Calendly).
+</ParamField>
+
+<ParamField path="user" type="UserIdentity | null">
+  Current user identity. When provided with email or userId, identifies the user. When null or undefined, clears the user identity. This is the recommended way to handle user identity in server-rendered apps.
+</ParamField>
+
+## Server-Side User Identity
+
+For server-rendered apps (Next.js, Remix), pass the user identity from your auth system as a prop. This ensures the user is identified immediately without a client-side round-trip.
+
+```tsx
+// app/layout.tsx (Next.js App Router with Auth)
+import { OutlitProvider } from '@outlit/tracker/react'
+import { auth } from '@/auth' // Your auth library
+
+export default async function RootLayout({ children }) {
+  const session = await auth()
+
+  return (
+    <html>
+      <body>
+        <OutlitProvider 
+          publicKey={process.env.NEXT_PUBLIC_OUTLIT_KEY!}
+          user={session?.user ? {
+            email: session.user.email,
+            userId: session.user.id,
+            traits: {
+              name: session.user.name,
+            }
+          } : null}
+        >
+          {children}
+        </OutlitProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+<Info>
+  When the `user` prop changes (login/logout), the provider automatically calls `setUser()` or `clearUser()` to update the identity.
+</Info>
 
 ## Consent Management
 
@@ -240,6 +294,12 @@ function MyComponent() {
   const {
     track,
     identify,
+    setUser,
+    clearUser,
+    activate,
+    engaged,
+    paid,
+    churned,
     getVisitorId,
     isInitialized,
     isTrackingEnabled,
@@ -270,6 +330,30 @@ function MyComponent() {
 
 <ParamField path="identify" type="(options: IdentifyOptions) => void">
   Identify the current visitor.
+</ParamField>
+
+<ParamField path="setUser" type="(identity: UserIdentity) => void">
+  Set the current user identity. Ideal for SPA authentication flows.
+</ParamField>
+
+<ParamField path="clearUser" type="() => void">
+  Clear the current user identity (on logout).
+</ParamField>
+
+<ParamField path="activate" type="(properties?: object) => void">
+  Mark the current user as activated.
+</ParamField>
+
+<ParamField path="engaged" type="(properties?: object) => void">
+  Mark the current user as engaged.
+</ParamField>
+
+<ParamField path="paid" type="(properties?: object) => void">
+  Mark the current user as paid.
+</ParamField>
+
+<ParamField path="churned" type="(properties?: object) => void">
+  Mark the current user as churned.
 </ParamField>
 
 <ParamField path="getVisitorId" type="() => string | null">
@@ -330,6 +414,43 @@ function LoginForm() {
   }
 }
 ```
+
+## Journey Stage Events
+
+Track user progression through your product lifecycle:
+
+```tsx
+'use client'
+
+import { useOutlit } from '@outlit/tracker/react'
+
+function OnboardingComplete() {
+  const { activate } = useOutlit()
+
+  const handleComplete = () => {
+    activate({ flow: 'onboarding', step: 'completed' })
+  }
+
+  return <button onClick={handleComplete}>Complete Setup</button>
+}
+```
+
+```tsx
+// After a successful payment
+function PaymentSuccess({ plan, amount }) {
+  const { paid } = useOutlit()
+
+  useEffect(() => {
+    paid({ plan, amount })
+  }, [plan, amount, paid])
+
+  return <div>Payment successful!</div>
+}
+```
+
+<Warning>
+  Stage methods (`activate`, `engaged`, `paid`, `churned`) require the user to be identified first. Use `setUser()`, `identify()`, or the `user` prop before calling stage methods.
+</Warning>
 
 ## Framework Examples
 
@@ -476,12 +597,14 @@ import { useOutlit } from '@outlit/tracker/react'
 import { useUser } from '@/hooks/use-user' // Your auth hook
 
 function AuthObserver() {
-  const { identify } = useOutlit()
+  const { setUser, clearUser } = useOutlit()
   const { user, isLoading } = useUser()
 
   useEffect(() => {
-    if (user && !isLoading) {
-      identify({
+    if (isLoading) return
+
+    if (user) {
+      setUser({
         email: user.email,
         userId: user.id,
         traits: {
@@ -489,8 +612,10 @@ function AuthObserver() {
           plan: user.subscription?.plan
         }
       })
+    } else {
+      clearUser()
     }
-  }, [user, isLoading, identify])
+  }, [user, isLoading, setUser, clearUser])
 
   return null
 }
@@ -506,13 +631,21 @@ import {
   OutlitProvider,
   type OutlitProviderProps,
   type UseOutlitReturn,
+  type UserIdentity,
 } from '@outlit/tracker/react'
 
 // Types are inferred
-const { track, identify } = useOutlit()
+const { track, identify, setUser } = useOutlit()
 
 // Or explicitly typed
 const outlit: UseOutlitReturn = useOutlit()
+
+// User identity type
+const user: UserIdentity = {
+  email: 'user@example.com',
+  userId: 'usr_123',
+  traits: { name: 'Jane' }
+}
 ```
 
 ## Next Steps
@@ -525,4 +658,3 @@ const outlit: UseOutlitReturn = useOutlit()
     Learn how profiles are merged
   </Card>
 </CardGroup>
-

@@ -56,7 +56,7 @@ On first visit, Outlit captures:
 
 ### Events Stored
 
-While anonymous, these events are stored in `VisitorEvent`:
+All events are stored for anonymous visitors and will be linked when they identify:
 
 ```typescript
 // All these are tracked for anonymous visitors
@@ -67,11 +67,9 @@ outlit.track('feature_explored', { feature: 'integrations' })
 
 ### Form Data
 
-Form submissions are captured with sanitization:
+Form submissions are captured with automatic sanitization:
 
-```typescript
-// Form submitted with email = "jane@acme.com", name = "Jane"
-// Stored in VisitorEvent with formData
+```json
 {
   "type": "form",
   "formId": "contact-form",
@@ -79,10 +77,13 @@ Form submissions are captured with sanitization:
     "email": "jane@acme.com",
     "name": "Jane",
     "company": "Acme Inc"
-    // password, credit_card, etc. are automatically removed
   }
 }
 ```
+
+<Note>
+  Sensitive fields (password, credit_card, SSN, etc.) are automatically removed from form data.
+</Note>
 
 ## Visitor ID Storage
 
@@ -123,12 +124,12 @@ outlit.identify({
 
 ### What Happens
 
-1. **Find or create CustomerContact** with the provided email
-2. **Link AnonymousVisitor** by setting `resolvedToContactId`
-3. **Background job processes** historical events:
-   - Converts VisitorEvents to CustomerActivity
-   - Preserves original timestamps
-   - Adds to unified timeline
+1. **Find or create contact** with the provided email
+2. **Link the anonymous visitor** to the contact
+3. **Historical events are processed**:
+   - All previous events are added to the customer timeline
+   - Original timestamps are preserved
+   - The complete journey is now visible
 
 ### Timeline After Resolution
 

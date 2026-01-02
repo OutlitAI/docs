@@ -20,9 +20,8 @@ POST https://app.outlit.ai/api/i/v1/{publicKey}/events
 
 ```json
 {
-  "publicKey": "pk_your_public_key",
   "visitorId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "source": "pixel",
+  "source": "client",
   "events": [
     {
       "type": "pageview",
@@ -38,23 +37,55 @@ POST https://app.outlit.ai/api/i/v1/{publicKey}/events
 
 ### Body Parameters
 
-<ParamField body="publicKey" type="string" required>
-  Your public key (must match URL path).
+<ParamField body="visitorId" type="string">
+  Unique identifier for the visitor (UUID format). Required for browser (`client`) tracking. For server-side tracking (`server` source), this can be omitted—identity is derived from email/userId in the events.
 </ParamField>
 
-<ParamField body="visitorId" type="string" required>
-  Unique identifier for the visitor. For browser tracking, this is auto-generated. For server-side, use a consistent ID or derive from email/userId.
-</ParamField>
-
-<ParamField body="source" type="string" default="pixel">
-  Event source. One of: `pixel` (browser), `server`, `integration`.
+<ParamField body="source" type="string" default="client">
+  Event source. One of: `client` (browser), `server`, `integration`.
 </ParamField>
 
 <ParamField body="events" type="array" required>
   Array of event objects to ingest (max 100 per request).
 </ParamField>
 
+<ParamField body="userIdentity" type="object">
+  Optional user identity for immediate resolution. Used by browser SDK when user is logged in (via `setUser()`). Allows direct identity resolution instead of anonymous visitor flow.
+  
+  | Property | Type | Description |
+  |----------|------|-------------|
+  | `email` | string | User's email address |
+  | `userId` | string | Your internal user ID |
+</ParamField>
+
 ## Event Types
+
+All events share these common fields:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | string | Yes | Event type (see below) |
+| `timestamp` | number | No | Unix timestamp in milliseconds. Defaults to server time. |
+| `url` | string | Yes | Full page URL |
+| `path` | string | Yes | URL path (e.g., `/pricing`) |
+| `referrer` | string | No | Referrer URL |
+| `utm` | object | No | UTM parameters (see below) |
+
+### UTM Parameters
+
+```json
+{
+  "utm": {
+    "source": "google",
+    "medium": "cpc",
+    "campaign": "spring_2024",
+    "term": "pricing software",
+    "content": "header_cta"
+  }
+}
+```
+
+---
 
 ### Pageview Event
 
@@ -67,11 +98,11 @@ Track a page view.
   "path": "/pricing",
   "title": "Pricing - Example",
   "referrer": "https://google.com/search?q=example",
-  "utmSource": "google",
-  "utmMedium": "cpc",
-  "utmCampaign": "spring_2024",
-  "utmTerm": "pricing software",
-  "utmContent": "header_cta",
+  "utm": {
+    "source": "google",
+    "medium": "cpc",
+    "campaign": "spring_2024"
+  },
   "timestamp": 1699999999999
 }
 ```
@@ -80,44 +111,8 @@ Track a page view.
   Must be `"pageview"`.
 </ParamField>
 
-<ParamField body="url" type="string" required>
-  Full page URL.
-</ParamField>
-
-<ParamField body="path" type="string" required>
-  URL path (e.g., `/pricing`).
-</ParamField>
-
 <ParamField body="title" type="string">
   Page title.
-</ParamField>
-
-<ParamField body="referrer" type="string">
-  Referrer URL.
-</ParamField>
-
-<ParamField body="utmSource" type="string">
-  UTM source parameter.
-</ParamField>
-
-<ParamField body="utmMedium" type="string">
-  UTM medium parameter.
-</ParamField>
-
-<ParamField body="utmCampaign" type="string">
-  UTM campaign parameter.
-</ParamField>
-
-<ParamField body="utmTerm" type="string">
-  UTM term parameter.
-</ParamField>
-
-<ParamField body="utmContent" type="string">
-  UTM content parameter.
-</ParamField>
-
-<ParamField body="timestamp" type="number">
-  Unix timestamp in milliseconds. Defaults to server time.
 </ParamField>
 
 ---
@@ -129,6 +124,8 @@ Track any custom event.
 ```json
 {
   "type": "custom",
+  "url": "https://example.com/pricing",
+  "path": "/pricing",
   "eventName": "button_clicked",
   "properties": {
     "buttonId": "cta-hero",
@@ -148,11 +145,7 @@ Track any custom event.
 </ParamField>
 
 <ParamField body="properties" type="object">
-  Key-value pairs of event properties.
-</ParamField>
-
-<ParamField body="timestamp" type="number">
-  Unix timestamp in milliseconds.
+  Key-value pairs of event properties. Values can be string, number, boolean, or null.
 </ParamField>
 
 ---
@@ -164,6 +157,8 @@ Track a form submission.
 ```json
 {
   "type": "form",
+  "url": "https://example.com/contact",
+  "path": "/contact",
   "formId": "contact-form",
   "formFields": {
     "email": "jane@example.com",
@@ -179,16 +174,12 @@ Track a form submission.
   Must be `"form"`.
 </ParamField>
 
-<ParamField body="formId" type="string" required>
+<ParamField body="formId" type="string">
   Identifier for the form (ID attribute or name).
 </ParamField>
 
-<ParamField body="formFields" type="object" required>
+<ParamField body="formFields" type="object">
   Key-value pairs of form field values.
-</ParamField>
-
-<ParamField body="timestamp" type="number">
-  Unix timestamp in milliseconds.
 </ParamField>
 
 <Warning>
@@ -204,6 +195,8 @@ Identify the visitor with their email/userId.
 ```json
 {
   "type": "identify",
+  "url": "https://example.com/signup",
+  "path": "/signup",
   "email": "jane@example.com",
   "userId": "usr_12345",
   "traits": {
@@ -232,9 +225,134 @@ Identify the visitor with their email/userId.
   Properties to set on the user profile.
 </ParamField>
 
-<ParamField body="timestamp" type="number">
-  Unix timestamp in milliseconds.
+---
+
+### Engagement Event
+
+Track active time on a page. Automatically sent by the browser SDK.
+
+```json
+{
+  "type": "engagement",
+  "url": "https://example.com/features",
+  "path": "/features",
+  "activeTimeMs": 45000,
+  "totalTimeMs": 60000,
+  "sessionId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+  "timestamp": 1699999999999
+}
+```
+
+<ParamField body="type" type="string" required>
+  Must be `"engagement"`.
 </ParamField>
+
+<ParamField body="activeTimeMs" type="number" required>
+  Time in milliseconds the user was actively engaged (visible tab + user interactions).
+</ParamField>
+
+<ParamField body="totalTimeMs" type="number" required>
+  Total wall-clock time in milliseconds on the page.
+</ParamField>
+
+<ParamField body="sessionId" type="string" required>
+  Session ID (UUID) for grouping engagement events. Resets after 30 min of inactivity or tab close.
+</ParamField>
+
+---
+
+### Calendar Event
+
+Track calendar booking from embedded widgets (Cal.com, Calendly).
+
+```json
+{
+  "type": "calendar",
+  "url": "https://example.com/demo",
+  "path": "/demo",
+  "provider": "cal.com",
+  "eventType": "30 Minute Demo",
+  "startTime": "2024-03-15T10:00:00Z",
+  "endTime": "2024-03-15T10:30:00Z",
+  "duration": 30,
+  "isRecurring": false,
+  "timestamp": 1699999999999
+}
+```
+
+<ParamField body="type" type="string" required>
+  Must be `"calendar"`.
+</ParamField>
+
+<ParamField body="provider" type="string" required>
+  Calendar provider: `"cal.com"`, `"calendly"`, or `"unknown"`.
+</ParamField>
+
+<ParamField body="eventType" type="string">
+  Meeting type name (e.g., "30 Minute Demo").
+</ParamField>
+
+<ParamField body="startTime" type="string">
+  Scheduled start time (ISO 8601 format).
+</ParamField>
+
+<ParamField body="endTime" type="string">
+  Scheduled end time (ISO 8601 format).
+</ParamField>
+
+<ParamField body="duration" type="number">
+  Duration in minutes.
+</ParamField>
+
+<ParamField body="isRecurring" type="boolean">
+  Whether this is a recurring meeting.
+</ParamField>
+
+<ParamField body="inviteeEmail" type="string">
+  Invitee's email (only available via server-side webhooks).
+</ParamField>
+
+<ParamField body="inviteeName" type="string">
+  Invitee's name (only available via server-side webhooks).
+</ParamField>
+
+---
+
+### Stage Event
+
+Track user journey stage transitions. Use this to mark users as activated, engaged, paid, or churned.
+
+```json
+{
+  "type": "stage",
+  "url": "https://example.com/onboarding",
+  "path": "/onboarding",
+  "stage": "activated",
+  "properties": {
+    "flow": "onboarding",
+    "step": "completed"
+  },
+  "timestamp": 1699999999999
+}
+```
+
+<ParamField body="type" type="string" required>
+  Must be `"stage"`.
+</ParamField>
+
+<ParamField body="stage" type="string" required>
+  The journey stage. One of: `"activated"`, `"engaged"`, `"paid"`, `"churned"`.
+</ParamField>
+
+<ParamField body="properties" type="object">
+  Additional context for the stage transition.
+</ParamField>
+
+<Info>
+  The `discovered` and `signed_up` stages are automatically inferred from identify events. Only use stage events for explicit milestone tracking.
+</Info>
+
+---
 
 ## Response
 
@@ -243,8 +361,7 @@ Identify the visitor with their email/userId.
 ```json
 {
   "success": true,
-  "processed": 3,
-  "errors": []
+  "processed": 3
 }
 ```
 
@@ -257,19 +374,36 @@ Identify the visitor with their email/userId.
 </ResponseField>
 
 <ResponseField name="errors" type="array">
-  Array of processing errors (if any).
+  Array of processing errors (only present if some events failed).
 </ResponseField>
+
+### Partial Success Response (HTTP 207)
+
+When some events succeed and others fail:
+
+```json
+{
+  "success": false,
+  "processed": 2,
+  "errors": [
+    {
+      "index": 2,
+      "message": "Invalid event type"
+    }
+  ]
+}
+```
 
 ### Error Response
 
 ```json
 {
   "success": false,
-  "message": "Invalid payload",
+  "processed": 0,
   "errors": [
     {
-      "path": ["events", 0, "type"],
-      "message": "Invalid enum value"
+      "index": -1,
+      "message": "Invalid or inactive tracking configuration"
     }
   ]
 }
@@ -277,20 +411,55 @@ Identify the visitor with their email/userId.
 
 ## Examples
 
-### cURL
+### cURL - Browser Events
 
 ```bash
 curl -X POST "https://app.outlit.ai/api/i/v1/pk_your_key/events" \
   -H "Content-Type: application/json" \
   -d '{
-    "publicKey": "pk_your_key",
-    "visitorId": "test-visitor-123",
+    "visitorId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "source": "client",
+    "events": [
+      {
+        "type": "pageview",
+        "url": "https://example.com/pricing",
+        "path": "/pricing",
+        "title": "Pricing",
+        "timestamp": 1699999999999
+      }
+    ]
+  }'
+```
+
+### cURL - Server Events
+
+```bash
+curl -X POST "https://app.outlit.ai/api/i/v1/pk_your_key/events" \
+  -H "Content-Type: application/json" \
+  -d '{
     "source": "server",
     "events": [
       {
+        "type": "identify",
+        "url": "server://jane@acme.com",
+        "path": "/",
+        "email": "jane@acme.com",
+        "userId": "usr_123",
+        "traits": {
+          "name": "Jane Doe",
+          "plan": "pro"
+        }
+      },
+      {
         "type": "custom",
-        "eventName": "api_test",
-        "properties": { "test": true }
+        "url": "server://jane@acme.com",
+        "path": "/",
+        "eventName": "subscription_created",
+        "properties": {
+          "__email": "jane@acme.com",
+          "plan": "pro",
+          "amount": 99
+        }
       }
     ]
   }'
@@ -305,9 +474,8 @@ const response = await fetch(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      publicKey: 'pk_your_key',
       visitorId: 'visitor-123',
-      source: 'pixel',
+      source: 'client',
       events: [
         {
           type: 'pageview',
@@ -334,14 +502,14 @@ import time
 response = requests.post(
     'https://app.outlit.ai/api/i/v1/pk_your_key/events',
     json={
-        'publicKey': 'pk_your_key',
-        'visitorId': 'python-visitor-123',
         'source': 'server',
         'events': [
             {
-                'type': 'custom',
-                'eventName': 'python_event',
-                'properties': {'sdk': 'python'},
+                'type': 'identify',
+                'url': 'server://jane@example.com',
+                'path': '/',
+                'email': 'jane@example.com',
+                'traits': {'name': 'Jane Doe'},
                 'timestamp': int(time.time() * 1000)
             }
         ]
@@ -350,6 +518,37 @@ response = requests.post(
 
 print(response.json())
 ```
+
+## Server-Side Events
+
+For server-side tracking, the `visitorId` field can be omitted. Identity is resolved from the event data:
+
+- **Identify events**: Use `email` and/or `userId` fields
+- **Custom events**: Include `__email` and/or `__userId` in properties
+
+```json
+{
+  "source": "server",
+  "events": [
+    {
+      "type": "custom",
+      "url": "server://user@example.com",
+      "path": "/",
+      "eventName": "payment_received",
+      "properties": {
+        "__email": "user@example.com",
+        "__userId": "usr_123",
+        "amount": 99,
+        "currency": "USD"
+      }
+    }
+  ]
+}
+```
+
+<Warning>
+  Server events **require identity**. The request will fail if no identify event or identity properties are found in the batch.
+</Warning>
 
 ## Batching Best Practices
 
@@ -384,9 +583,8 @@ async function flush() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        publicKey: 'pk_xxx',
         visitorId: getVisitorId(),
-        source: 'pixel',
+        source: 'client',
         events
       })
     })
@@ -399,4 +597,3 @@ async function flush() {
 setInterval(flush, FLUSH_INTERVAL)
 window.addEventListener('beforeunload', flush)
 ```
-

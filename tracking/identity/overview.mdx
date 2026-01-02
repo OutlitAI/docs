@@ -226,8 +226,8 @@ When merging two contacts:
     **Anonymous visitors are supported**
     
     - visitorId auto-generated
-    - Events stored as AnonymousVisitor
-    - Later linked via identify()
+    - Events stored until identification
+    - Later linked via identify() or setUser()
     
     ```typescript
     // Works without identity
@@ -235,6 +235,12 @@ When merging two contacts:
     
     // Later, when they sign up
     outlit.identify({ email: 'user@example.com' })
+    
+    // Or for SPAs, use setUser after authentication
+    outlit.setUser({ 
+      email: 'user@example.com',
+      userId: 'usr_123'
+    })
     ```
   </Tab>
   <Tab title="Server Tracking">
@@ -242,7 +248,7 @@ When merging two contacts:
     
     - No anonymous tracking
     - Every call needs email or userId
-    - Events go directly to CustomerContact
+    - Events go directly to the contact
     
     ```typescript
     // Email or userId REQUIRED

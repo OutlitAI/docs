@@ -163,6 +163,58 @@ outlit.identify({
   Properties to update on the user profile.
 </ParamField>
 
+### Journey Stage Methods
+
+Track user progression through your product lifecycle. All stage methods require either `email` or `userId`.
+
+#### `outlit.activate(options)`
+
+Mark a user as activated. Typically called after a user completes onboarding or a key activation milestone.
+
+```typescript
+outlit.activate({
+  email: 'user@example.com',
+  properties: { flow: 'onboarding' }
+})
+```
+
+#### `outlit.engaged(options)`
+
+Mark a user as engaged. Typically called when a user reaches a usage milestone. Can also be computed automatically by the engagement cron.
+
+```typescript
+outlit.engaged({
+  userId: 'usr_123',
+  properties: { milestone: 'first_project_created' }
+})
+```
+
+#### `outlit.paid(options)`
+
+Mark a user as paid. Typically called after a successful payment or subscription.
+
+```typescript
+outlit.paid({
+  email: 'user@example.com',
+  properties: { plan: 'pro', amount: 99 }
+})
+```
+
+#### `outlit.churned(options)`
+
+Mark a user as churned. Typically called when a subscription is cancelled.
+
+```typescript
+outlit.churned({
+  email: 'user@example.com',
+  properties: { reason: 'cancelled_by_user' }
+})
+```
+
+<Info>
+  The `discovered` and `signed_up` stages are automatically inferred from identify calls. You only need to explicitly call `activate()`, `engaged()`, `paid()`, or `churned()`.
+</Info>
+
 ### `outlit.flush()`
 
 Immediately send all queued events. **Call this before your process exits.**
@@ -236,7 +288,7 @@ import { Outlit } from '@outlit/tracker-node'
 const outlit = new Outlit({ publicKey: process.env.OUTLIT_KEY! })
 
 export async function POST(request: Request) {
-  const { userId, email, newPlan } = await request.json()
+  const { userId, email, newPlan, amount } = await request.json()
 
   // Your upgrade logic
   await upgradeSubscription(userId, newPlan)
@@ -247,6 +299,12 @@ export async function POST(request: Request) {
     userId,
     eventName: 'subscription_upgraded',
     properties: { plan: newPlan }
+  })
+
+  // Mark as paid
+  outlit.paid({
+    email,
+    properties: { plan: newPlan, amount }
   })
 
   // Flush immediately (serverless)
@@ -280,6 +338,52 @@ export async function handler(event) {
   await outlit.flush()
 
   return { statusCode: 200, body: 'OK' }
+}
+```
+
+### Stripe Webhooks
+
+Track payment and subscription events from Stripe:
+
+```typescript
+import { Outlit } from '@outlit/tracker-node'
+import Stripe from 'stripe'
+
+const outlit = new Outlit({ publicKey: process.env.OUTLIT_KEY! })
+
+export async function handleStripeWebhook(event: Stripe.Event) {
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session
+      if (session.customer_email) {
+        outlit.paid({
+          email: session.customer_email,
+          properties: {
+            amount: session.amount_total ? session.amount_total / 100 : undefined,
+            currency: session.currency,
+          }
+        })
+      }
+      break
+    }
+
+    case 'customer.subscription.deleted': {
+      const subscription = event.data.object as Stripe.Subscription
+      // Get customer email from your database
+      const customerEmail = await getCustomerEmail(subscription.customer)
+      if (customerEmail) {
+        outlit.churned({
+          email: customerEmail,
+          properties: {
+            reason: subscription.cancellation_details?.reason,
+          }
+        })
+      }
+      break
+    }
+  }
+
+  await outlit.flush()
 }
 ```
 
@@ -352,6 +456,7 @@ import {
   type OutlitOptions,
   type ServerTrackOptions,
   type ServerIdentifyOptions,
+  type StageOptions,
 } from '@outlit/tracker-node'
 
 const options: OutlitOptions = {
@@ -368,6 +473,14 @@ const trackOptions: ServerTrackOptions = {
 }
 
 outlit.track(trackOptions)
+
+// Stage options
+const stageOptions: StageOptions = {
+  email: 'user@test.com',
+  properties: { plan: 'pro' }
+}
+
+outlit.paid(stageOptions)
 ```
 
 ## Next Steps
@@ -380,4 +493,3 @@ outlit.track(trackOptions)
     Direct API access for custom integrations
   </Card>
 </CardGroup>
-

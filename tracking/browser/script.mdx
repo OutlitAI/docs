@@ -16,7 +16,7 @@ Add this snippet before the closing `</body>` tag. This creates a lightweight st
   !function(w,d,src,key,auto){
     if(w.outlit&&w.outlit._loaded)return;
     w.outlit=w.outlit||{_q:[]};
-    ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId"].forEach(function(m){
+    ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId","setUser","clearUser","activate","engaged","paid","churned"].forEach(function(m){
       w.outlit[m]=w.outlit[m]||function(){w.outlit._q.push([m,[].slice.call(arguments)])};
     });
     var s=d.createElement("script");s.async=1;s.src=src;
@@ -68,6 +68,14 @@ If you prefer a cleaner script tag and don't need to call tracking methods befor
 
 <ParamField path="data-track-calendar-embeds" type="string">
   Set to `"false"` to disable automatic tracking of calendar bookings from Cal.com and Calendly embeds. See [Calendar Embed Tracking](/tracking/browser/calendar-embeds) for details.
+</ParamField>
+
+<ParamField path="data-track-engagement" type="string">
+  Set to `"false"` to disable engagement tracking (active time on page). When enabled (default), emits engagement events on page exit and navigation capturing how long users actively engaged with each page.
+</ParamField>
+
+<ParamField path="data-idle-timeout" type="string">
+  Idle timeout in milliseconds for engagement tracking. After this period of no user interaction, the user is considered idle and active time stops accumulating. Default is `"30000"` (30 seconds).
 </ParamField>
 
 ## Consent Management
@@ -240,6 +248,52 @@ window.outlit.identify({
 <Warning>
   At least one of `email` or `userId` should be provided. Without identity information, the call has no effect.
 </Warning>
+
+### Set User Identity
+
+For SPA applications where you know the user's identity after authentication:
+
+```javascript
+// After user logs in
+window.outlit.setUser({
+  email: 'jane@example.com',
+  userId: 'usr_12345',
+  traits: {
+    name: 'Jane Doe',
+    plan: 'pro'
+  }
+})
+```
+
+<Info>
+  `setUser()` can be called before tracking is enabled (with `data-auto-track="false"`). The identity is queued and applied when `enableTracking()` is called.
+</Info>
+
+### Clear User Identity
+
+Call when the user logs out:
+
+```javascript
+window.outlit.clearUser()
+```
+
+### Journey Stage Methods
+
+Track user progression through your product lifecycle. These require the user to be identified first (via `setUser()` or `identify()`).
+
+```javascript
+// After user completes onboarding
+window.outlit.activate({ flow: 'onboarding' })
+
+// When user reaches an engagement milestone
+window.outlit.engaged({ milestone: 'first_project' })
+
+// After successful payment
+window.outlit.paid({ plan: 'pro', amount: 99 })
+
+// When subscription is cancelled
+window.outlit.churned({ reason: 'too_expensive' })
+```
 
 ### Get Visitor ID
 

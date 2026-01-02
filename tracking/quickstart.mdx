@@ -174,7 +174,8 @@ With the default configuration, Outlit automatically captures:
 | **Pageview** | Every navigation | URL, path, title, referrer, UTM params |
 | **Form Submit** | Form submission | Form ID, field values (sensitive fields removed) |
 | **Auto-Identify** | Form with email | Email + name extracted, visitor linked to profile |
-| **Session Start** | First visit | Landing page, referrer, UTM attribution |
+| **Engagement** | Page exit/navigation | Active time, total time on page |
+| **Calendar Booking** | Cal.com/Calendly embed | Provider, event type, scheduled time |
 
 <Tip>
   **Zero-code identification:** When a visitor submits a form with an email field (signup, contact, demo request), they're automatically identified and linked to a customer profile. No manual `identify()` call needed! [Learn more](/tracking/identity/overview#auto-identify)

@@ -18,8 +18,8 @@ Outlit connects all of these into a unified customer timeline.
 ```mermaid
 %%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#6366f1', 'primaryTextColor': '#fff', 'primaryBorderColor': '#4f46e5', 'lineColor': '#818cf8', 'secondaryColor': '#a5b4fc', 'tertiaryColor': '#e0e7ff', 'textColor': '#1e1b4b', 'nodeTextColor': '#1e1b4b' }}}%%
 flowchart LR
-    A[Anonymous Visitor] -->|pageviews, forms| B[AnonymousVisitor Record]
-    B -->|identify call| C[CustomerContact]
+    A[Anonymous Visitor] -->|pageviews, forms| B[Visitor Record]
+    B -->|identify call| C[Known Contact]
     C --> D[Customer Timeline]
     E[Server Events] -->|email/userId| C
     F[CRM Sync] --> D
@@ -35,13 +35,14 @@ When a visitor lands on your website, Outlit:
    - Pageviews (URL, title, referrer)
    - Form submissions (with sensitive field sanitization)
    - UTM parameters and first-touch attribution
-3. **Stores events** in the `AnonymousVisitor` record until identification
+   - Engagement time (active time on each page)
+3. **Stores events** until identification
 
 ### Identity Resolution
 
 When a visitor identifies themselves (signup, login, form submission with email), Outlit:
 
-1. **Creates or finds a CustomerContact** using the email or user ID
+1. **Creates or finds a contact** using the email or user ID
 2. **Links the anonymous visitor** to the contact
 3. **Converts historical events** to the customer timeline
 4. **Merges profiles** if the same person used different devices
@@ -51,59 +52,8 @@ When a visitor identifies themselves (signup, login, form submission with email)
 For authenticated users in your backend:
 
 1. **Skip the anonymous phase** - Users are already known
-2. **Emit events directly** to the CustomerContact
+2. **Emit events directly** to the contact
 3. **Require identity** - Email or user ID on every call
-
-## Data Model
-
-<AccordionGroup>
-  <Accordion title="AnonymousVisitor" icon="user-secret">
-    Represents an unknown website visitor before identification.
-    
-    | Field | Description |
-    |-------|-------------|
-    | `visitorId` | Browser-generated UUID (stored in localStorage) |
-    | `firstTouchUtm` | UTM parameters from first visit |
-    | `firstLandingUrl` | First page they visited |
-    | `firstReferrer` | Where they came from |
-    | `ipAddress` | For company enrichment |
-    | `resolvedToContactId` | Link to CustomerContact after identification |
-  </Accordion>
-  
-  <Accordion title="CustomerContact" icon="user">
-    A known person associated with a customer account.
-    
-    | Field | Description |
-    |-------|-------------|
-    | `email` | Primary identifier (required) |
-    | `customerId` | Link to the Customer/Account |
-    | `name`, `phone`, `jobTitle` | Profile information |
-    | `role`, `influence` | Your classification |
-  </Accordion>
-  
-  <Accordion title="Customer" icon="building">
-    A company or individual account in your system.
-    
-    | Field | Description |
-    |-------|-------------|
-    | `name` | Company or individual name |
-    | `domain` | Primary domain for resolution |
-    | `type` | `COMPANY` or `INDIVIDUAL` |
-    | `status` | `ACTIVE`, `PROVISIONAL`, `MERGED` |
-  </Accordion>
-  
-  <Accordion title="CustomerActivity" icon="bolt">
-    A single event in the customer timeline.
-    
-    | Field | Description |
-    |-------|-------------|
-    | `activityType` | What happened (e.g., `FEATURE_USED`, `PAGE_VIEW`) |
-    | `activityChannel` | Category (`PRODUCT`, `COMMUNICATION`, `BILLING`) |
-    | `occurredAt` | When it happened |
-    | `title`, `summary` | Human-readable description |
-    | `metadata` | Event-specific data |
-  </Accordion>
-</AccordionGroup>
 
 ## Event Types
 
@@ -116,6 +66,8 @@ These are captured automatically by the browser tracker:
 | `pageview` | Every navigation | URL, path, title, referrer, UTM |
 | `form` | Form submission | Form ID, field values (sanitized) |
 | `identify` | Form with email field | Email, name (auto-extracted) |
+| `engagement` | Page exit or navigation | Active time, total time, session ID |
+| `calendar` | Cal.com/Calendly booking | Provider, event type, time, duration |
 
 <Tip>
   **Auto-Identify:** When a form contains an email field, Outlit automatically calls `identify()` with the extracted email and name. This links the anonymous visitor to a known profile without any code. [Learn more](/tracking/identity/overview#auto-identify)
@@ -141,6 +93,28 @@ outlit.identify({
   }
 })
 ```
+
+### Journey Stage Events
+
+Track user progression through your product lifecycle:
+
+```typescript
+// After user completes onboarding
+outlit.activate({ flow: 'onboarding' })
+
+// When user reaches an engagement milestone
+outlit.engaged({ milestone: 'first_project' })
+
+// After successful payment
+outlit.paid({ plan: 'pro', amount: 99 })
+
+// When subscription is cancelled
+outlit.churned({ reason: 'too_expensive' })
+```
+
+<Info>
+  Stage events require the user to be identified first (via `identify()` or `setUser()`). The `discovered` and `signed_up` stages are automatically inferred from identify calls.
+</Info>
 
 ## Privacy & Security
 
@@ -175,4 +149,3 @@ outlit.identify({
     Understand identity resolution
   </Card>
 </Columns>
-
