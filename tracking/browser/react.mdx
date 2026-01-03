@@ -21,7 +21,60 @@ yarn add @outlit/tracker
 
 ## Quick Start
 
-Wrap your app with `OutlitProvider` and use the `useOutlit` hook in components:
+Wrap your app with `OutlitProvider` and use the `useOutlit` hook in components.
+
+<Tabs>
+  <Tab title="With Authentication (Recommended)">
+If your app has user authentication, pass the user identity via the `user` prop. This is the recommended approach as it automatically handles login/logout transitions.
+
+```tsx
+// app/providers.tsx (Client Component)
+'use client'
+
+import { OutlitProvider } from '@outlit/tracker/react'
+import { useUser } from '@clerk/nextjs' // or useAuth0, useSession, etc.
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const { user, isLoaded } = useUser()
+
+  // Build user identity from your auth provider
+  const outlitUser = isLoaded && user ? {
+    email: user.primaryEmailAddress?.emailAddress,
+    userId: user.id,
+    traits: {
+      name: user.fullName,
+    }
+  } : null
+
+  return (
+    <OutlitProvider 
+      publicKey="pk_your_key" 
+      trackPageviews
+      user={outlitUser}
+    >
+      {children}
+    </OutlitProvider>
+  )
+}
+```
+
+```tsx
+// app/layout.tsx
+import { Providers } from './providers'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  )
+}
+```
+  </Tab>
+  <Tab title="Anonymous Only">
+For marketing sites without authentication, just add the provider:
 
 ```tsx
 // app/layout.tsx (Next.js App Router)
@@ -39,6 +92,12 @@ export default function RootLayout({ children }) {
   )
 }
 ```
+  </Tab>
+</Tabs>
+
+### Using the Hook
+
+Track custom events with the `useOutlit` hook:
 
 ```tsx
 // components/pricing-button.tsx
@@ -129,12 +188,48 @@ import { OutlitProvider } from '@outlit/tracker/react'
   Current user identity. When provided with email or userId, identifies the user. When null or undefined, clears the user identity. This is the recommended way to handle user identity in server-rendered apps.
 </ParamField>
 
-## Server-Side User Identity
+## User Identity Patterns
 
-For server-rendered apps (Next.js, Remix), pass the user identity from your auth system as a prop. This ensures the user is identified immediately without a client-side round-trip.
+The `user` prop is the **recommended** way to handle user identity. It's simpler and more reliable than manual `identify()` calls because:
+
+- **Automatic lifecycle management**: Login/logout transitions are handled automatically
+- **No timing issues**: Identity is set before any events are tracked
+- **Cleaner code**: No need for useEffect + identify() synchronization
+
+### Pattern 1: Client-Side Auth (Clerk, Auth0, etc.)
+
+For auth libraries that provide React hooks:
 
 ```tsx
-// app/layout.tsx (Next.js App Router with Auth)
+// app/providers.tsx
+'use client'
+
+import { OutlitProvider } from '@outlit/tracker/react'
+import { useUser } from '@clerk/nextjs' // or useAuth0, useSession, etc.
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const { user, isLoaded } = useUser()
+
+  const outlitUser = isLoaded && user ? {
+    email: user.primaryEmailAddress?.emailAddress,
+    userId: user.id,
+    traits: { name: user.fullName }
+  } : null
+
+  return (
+    <OutlitProvider publicKey="pk_xxx" user={outlitUser}>
+      {children}
+    </OutlitProvider>
+  )
+}
+```
+
+### Pattern 2: Server-Side Auth (NextAuth, Lucia, etc.)
+
+For auth systems where session is available server-side:
+
+```tsx
+// app/layout.tsx (Server Component)
 import { OutlitProvider } from '@outlit/tracker/react'
 import { auth } from '@/auth' // Your auth library
 
@@ -149,9 +244,7 @@ export default async function RootLayout({ children }) {
           user={session?.user ? {
             email: session.user.email,
             userId: session.user.id,
-            traits: {
-              name: session.user.name,
-            }
+            traits: { name: session.user.name }
           } : null}
         >
           {children}
@@ -162,8 +255,17 @@ export default async function RootLayout({ children }) {
 }
 ```
 
+<Tip>
+  **Which pattern should I use?**
+  
+  - **Client-side auth hooks** (Clerk, Auth0): Use Pattern 1 with a client providers component
+  - **Server-side sessions** (NextAuth, Lucia, custom JWT): Use Pattern 2 directly in the layout
+  
+  Both patterns work equally well - choose based on how your auth library provides user data.
+</Tip>
+
 <Info>
-  When the `user` prop changes (login/logout), the provider automatically calls `setUser()` or `clearUser()` to update the identity.
+  When the `user` prop changes (login/logout), the provider automatically calls `setUser()` or `clearUser()` internally. You don't need to call these methods manually.
 </Info>
 
 ## Consent Management
@@ -590,7 +692,11 @@ function ContactForm() {
 
 ### Identify After Auth
 
-Identify after authentication:
+<Warning>
+  **Prefer the `user` prop instead.** The pattern below works, but using the `user` prop on `OutlitProvider` is cleaner and handles the lifecycle automatically. See [User Identity Patterns](#user-identity-patterns) above.
+</Warning>
+
+If you can't use the `user` prop (e.g., the provider is in a different part of the tree), you can sync manually:
 
 ```tsx
 import { useOutlit } from '@outlit/tracker/react'
