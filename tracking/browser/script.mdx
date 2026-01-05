@@ -22,7 +22,7 @@ Add this snippet before the closing `</body>` tag. This creates a lightweight st
     var s=d.createElement("script");s.async=1;s.src=src;
     s.dataset.publicKey=key;if(auto!==undefined)s.dataset.autoTrack=auto;
     (d.body||d.head).appendChild(s);
-  }(window,document,"https://cdn.outlit.ai/outlit.js","pk_your_public_key");
+  }(window,document,"https://cdn.outlit.ai/stable/outlit.js","pk_your_public_key");
 </script>
 ```
 
@@ -36,7 +36,7 @@ If you prefer a cleaner script tag and don't need to call tracking methods befor
 
 ```html
 <script
-  src="https://cdn.outlit.ai/outlit.js"
+  src="https://cdn.outlit.ai/stable/outlit.js"
   data-public-key="pk_your_public_key"
   async
 ></script>
@@ -93,7 +93,7 @@ If you're using a consent management platform (CMP) or need to wait for user con
     var s=d.createElement("script");s.async=1;s.src=src;
     s.dataset.publicKey=key;if(auto!==undefined)s.dataset.autoTrack=auto;
     (d.body||d.head).appendChild(s);
-  }(window,document,"https://cdn.outlit.ai/outlit.js","pk_your_public_key",false);
+  }(window,document,"https://cdn.outlit.ai/stable/outlit.js","pk_your_public_key",false);
 </script>
 
 <script>
@@ -108,7 +108,7 @@ Or with the simple script tag:
 
 ```html
 <script
-  src="https://cdn.outlit.ai/outlit.js"
+  src="https://cdn.outlit.ai/stable/outlit.js"
   data-public-key="pk_your_public_key"
   data-auto-track="false"
   async
@@ -316,7 +316,7 @@ The tracker supports commands even before it fully loads. Commands are queued an
 </script>
 
 <script
-  src="https://cdn.outlit.ai/outlit.js"
+  src="https://cdn.outlit.ai/stable/outlit.js"
   data-public-key="pk_xxx"
   async
 ></script>
@@ -369,7 +369,7 @@ For performance, events are batched and sent:
   </script>
 
   <script
-    src="https://cdn.outlit.ai/outlit.js"
+    src="https://cdn.outlit.ai/stable/outlit.js"
     data-public-key="pk_your_public_key"
     async
   ></script>
