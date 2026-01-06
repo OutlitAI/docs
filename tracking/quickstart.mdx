@@ -34,17 +34,17 @@ Choose your preferred integration method:
     Install the package:
 
     ```bash
-    npm install @outlit/tracker
+    npm install @outlit/browser
     # or
-    pnpm add @outlit/tracker
+    pnpm add @outlit/browser
     # or
-    yarn add @outlit/tracker
+    yarn add @outlit/browser
     ```
 
     Initialize once at app startup:
 
     ```typescript
-    import outlit from '@outlit/tracker'
+    import outlit from '@outlit/browser'
 
     outlit.init({ publicKey: 'pk_your_public_key_here' })
     ```
@@ -53,14 +53,14 @@ Choose your preferred integration method:
     Install the package:
 
     ```bash
-    npm install @outlit/tracker
+    npm install @outlit/browser
     ```
 
     Wrap your app with the provider:
 
     ```tsx
     // app/layout.tsx or _app.tsx
-    import { OutlitProvider } from '@outlit/tracker/react'
+    import { OutlitProvider } from '@outlit/browser/react'
 
     export default function RootLayout({ children }) {
       return (
@@ -108,7 +108,7 @@ window.outlit.track('trial_started', {
 ```
 
 ```tsx React
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 
 function PricingButton() {
   const { track } = useOutlit()
@@ -141,7 +141,7 @@ outlit.identify({
 ```
 
 ```tsx React
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 
 function LoginForm() {
   const { identify } = useOutlit()

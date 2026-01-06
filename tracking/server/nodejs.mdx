@@ -19,22 +19,22 @@ The Node.js SDK is designed for server-side tracking where users are already aut
 
 <CodeGroup>
 ```bash npm
-npm install @outlit/tracker-node
+npm install @outlit/node
 ```
 
 ```bash pnpm
-pnpm add @outlit/tracker-node
+pnpm add @outlit/node
 ```
 
 ```bash yarn
-yarn add @outlit/tracker-node
+yarn add @outlit/node
 ```
 </CodeGroup>
 
 ## Quick Start
 
 ```typescript
-import { Outlit } from '@outlit/tracker-node'
+import { Outlit } from '@outlit/node'
 
 const outlit = new Outlit({
   publicKey: 'pk_your_public_key'
@@ -245,7 +245,7 @@ console.log(`Pending events: ${outlit.queueSize}`)
 
 ```typescript
 import express from 'express'
-import { Outlit } from '@outlit/tracker-node'
+import { Outlit } from '@outlit/node'
 
 const app = express()
 const outlit = new Outlit({ publicKey: 'pk_xxx' })
@@ -283,7 +283,7 @@ process.on('SIGTERM', async () => {
 
 ```typescript
 // app/api/subscription/upgrade/route.ts
-import { Outlit } from '@outlit/tracker-node'
+import { Outlit } from '@outlit/node'
 
 const outlit = new Outlit({ publicKey: process.env.OUTLIT_KEY! })
 
@@ -321,7 +321,7 @@ export async function POST(request: Request) {
 </Warning>
 
 ```typescript
-import { Outlit } from '@outlit/tracker-node'
+import { Outlit } from '@outlit/node'
 
 const outlit = new Outlit({ publicKey: process.env.OUTLIT_KEY! })
 
@@ -346,7 +346,7 @@ export async function handler(event) {
 Track payment and subscription events from Stripe:
 
 ```typescript
-import { Outlit } from '@outlit/tracker-node'
+import { Outlit } from '@outlit/node'
 import Stripe from 'stripe'
 
 const outlit = new Outlit({ publicKey: process.env.OUTLIT_KEY! })
@@ -391,7 +391,7 @@ export async function handleStripeWebhook(event: Stripe.Event) {
 
 ```typescript
 import { Queue, Worker } from 'bullmq'
-import { Outlit } from '@outlit/tracker-node'
+import { Outlit } from '@outlit/node'
 
 const outlit = new Outlit({ publicKey: 'pk_xxx' })
 
@@ -457,7 +457,7 @@ import {
   type ServerTrackOptions,
   type ServerIdentifyOptions,
   type StageOptions,
-} from '@outlit/tracker-node'
+} from '@outlit/node'
 
 const options: OutlitOptions = {
   publicKey: 'pk_xxx',

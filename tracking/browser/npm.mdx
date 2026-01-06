@@ -7,15 +7,15 @@ description: "Full control over tracking with the npm package"
 
 <CodeGroup>
 ```bash npm
-npm install @outlit/tracker
+npm install @outlit/browser
 ```
 
 ```bash pnpm
-pnpm add @outlit/tracker
+pnpm add @outlit/browser
 ```
 
 ```bash yarn
-yarn add @outlit/tracker
+yarn add @outlit/browser
 ```
 </CodeGroup>
 
@@ -24,7 +24,7 @@ yarn add @outlit/tracker
 Initialize the tracker once at app startup, typically in your entry point:
 
 ```typescript
-import outlit from '@outlit/tracker'
+import outlit from '@outlit/browser'
 
 outlit.init({
   publicKey: 'pk_your_public_key',
@@ -88,7 +88,7 @@ outlit.init({
 If you need to wait for user consent before tracking:
 
 ```typescript
-import outlit from '@outlit/tracker'
+import outlit from '@outlit/browser'
 
 // Initialize without auto-tracking
 outlit.init({
@@ -105,7 +105,7 @@ function onConsentAccepted() {
 ### Check Tracking Status
 
 ```typescript
-import { isTrackingEnabled } from '@outlit/tracker'
+import { isTrackingEnabled } from '@outlit/browser'
 
 if (isTrackingEnabled()) {
   console.log('Tracking is active')
@@ -119,7 +119,7 @@ if (isTrackingEnabled()) {
 Initialize the tracker. Must be called before other methods.
 
 ```typescript
-import outlit from '@outlit/tracker'
+import outlit from '@outlit/browser'
 
 outlit.init({ publicKey: 'pk_xxx' })
 ```
@@ -256,7 +256,7 @@ const visitorId = tracker.getVisitorId()
 Enable tracking after consent. Only needed if `autoTrack: false` was set during init.
 
 ```typescript
-import outlit, { enableTracking } from '@outlit/tracker'
+import outlit, { enableTracking } from '@outlit/browser'
 
 // Initialize with autoTrack: false
 outlit.init({ publicKey: 'pk_xxx', autoTrack: false })
@@ -272,7 +272,7 @@ outlit.enableTracking()
 Check if tracking is currently enabled.
 
 ```typescript
-import { isTrackingEnabled } from '@outlit/tracker'
+import { isTrackingEnabled } from '@outlit/browser'
 
 if (isTrackingEnabled()) {
   // Tracking is active
@@ -289,7 +289,7 @@ import outlit, {
   type BrowserTrackOptions,
   type BrowserIdentifyOptions,
   type UserIdentity,
-} from '@outlit/tracker'
+} from '@outlit/browser'
 
 // Full type safety
 outlit.init({
@@ -313,7 +313,7 @@ outlit.track('purchase_completed', {
 'use client'
 
 import { useEffect } from 'react'
-import outlit from '@outlit/tracker'
+import outlit from '@outlit/browser'
 
 export function OutlitInit() {
   useEffect(() => {
@@ -344,7 +344,7 @@ export default function RootLayout({ children }) {
 // main.ts
 import { createApp } from 'vue'
 import App from './App.vue'
-import outlit from '@outlit/tracker'
+import outlit from '@outlit/browser'
 
 outlit.init({ publicKey: import.meta.env.VITE_OUTLIT_KEY })
 
@@ -354,7 +354,7 @@ createApp(App).mount('#app')
 ```vue
 <!-- Component.vue -->
 <script setup>
-import outlit from '@outlit/tracker'
+import outlit from '@outlit/browser'
 
 function handleClick() {
   outlit.track('button_clicked', { id: 'cta' })
@@ -366,7 +366,7 @@ function handleClick() {
 
 ```typescript
 // +layout.ts
-import outlit from '@outlit/tracker'
+import outlit from '@outlit/browser'
 
 outlit.init({ publicKey: import.meta.env.VITE_OUTLIT_KEY })
 ```
@@ -374,7 +374,7 @@ outlit.init({ publicKey: import.meta.env.VITE_OUTLIT_KEY })
 ```svelte
 <!-- Component.svelte -->
 <script>
-import outlit from '@outlit/tracker'
+import outlit from '@outlit/browser'
 
 function handleClick() {
   outlit.track('button_clicked', { id: 'cta' })

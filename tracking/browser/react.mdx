@@ -7,15 +7,15 @@ description: "First-class React support with Provider and hooks"
 
 <CodeGroup>
 ```bash npm
-npm install @outlit/tracker
+npm install @outlit/browser
 ```
 
 ```bash pnpm
-pnpm add @outlit/tracker
+pnpm add @outlit/browser
 ```
 
 ```bash yarn
-yarn add @outlit/tracker
+yarn add @outlit/browser
 ```
 </CodeGroup>
 
@@ -31,7 +31,7 @@ If your app has user authentication, pass the user identity via the `user` prop.
 // app/providers.tsx (Client Component)
 'use client'
 
-import { OutlitProvider } from '@outlit/tracker/react'
+import { OutlitProvider } from '@outlit/browser/react'
 import { useUser } from '@clerk/nextjs' // or useAuth0, useSession, etc.
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -78,7 +78,7 @@ For marketing sites without authentication, just add the provider:
 
 ```tsx
 // app/layout.tsx (Next.js App Router)
-import { OutlitProvider } from '@outlit/tracker/react'
+import { OutlitProvider } from '@outlit/browser/react'
 
 export default function RootLayout({ children }) {
   return (
@@ -103,7 +103,7 @@ Track custom events with the `useOutlit` hook:
 // components/pricing-button.tsx
 'use client'
 
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 
 export function PricingButton() {
   const { track } = useOutlit()
@@ -123,7 +123,7 @@ export function PricingButton() {
 The `OutlitProvider` initializes tracking and provides context to child components.
 
 ```tsx
-import { OutlitProvider } from '@outlit/tracker/react'
+import { OutlitProvider } from '@outlit/browser/react'
 
 <OutlitProvider
   publicKey="pk_xxx"
@@ -204,7 +204,7 @@ For auth libraries that provide React hooks:
 // app/providers.tsx
 'use client'
 
-import { OutlitProvider } from '@outlit/tracker/react'
+import { OutlitProvider } from '@outlit/browser/react'
 import { useUser } from '@clerk/nextjs' // or useAuth0, useSession, etc.
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -230,7 +230,7 @@ For auth systems where session is available server-side:
 
 ```tsx
 // app/layout.tsx (Server Component)
-import { OutlitProvider } from '@outlit/tracker/react'
+import { OutlitProvider } from '@outlit/browser/react'
 import { auth } from '@/auth' // Your auth library
 
 export default async function RootLayout({ children }) {
@@ -274,7 +274,7 @@ If you need to wait for user consent before tracking:
 
 ```tsx
 // app/layout.tsx
-import { OutlitProvider } from '@outlit/tracker/react'
+import { OutlitProvider } from '@outlit/browser/react'
 
 export default function RootLayout({ children }) {
   return (
@@ -289,7 +289,7 @@ export default function RootLayout({ children }) {
 // components/cookie-banner.tsx
 'use client'
 
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 
 export function CookieBanner() {
   const { enableTracking, isTrackingEnabled } = useOutlit()
@@ -323,7 +323,7 @@ export function CookieBanner() {
 ```tsx
 'use client'
 
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 import { useEffect } from 'react'
 
 export function CookiebotListener() {
@@ -350,7 +350,7 @@ export function CookiebotListener() {
 ```tsx
 'use client'
 
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 import { useEffect } from 'react'
 
 export function OneTrustListener() {
@@ -390,7 +390,7 @@ export function OneTrustListener() {
 The primary hook for tracking events and identifying users.
 
 ```tsx
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 
 function MyComponent() {
   const {
@@ -479,7 +479,7 @@ function MyComponent() {
 A convenience hook that returns just the `track` function:
 
 ```tsx
-import { useTrack } from '@outlit/tracker/react'
+import { useTrack } from '@outlit/browser/react'
 
 function FeatureButton({ featureId }) {
   const track = useTrack()
@@ -497,7 +497,7 @@ function FeatureButton({ featureId }) {
 A convenience hook that returns just the `identify` function:
 
 ```tsx
-import { useIdentify } from '@outlit/tracker/react'
+import { useIdentify } from '@outlit/browser/react'
 
 function LoginForm() {
   const identify = useIdentify()
@@ -524,7 +524,7 @@ Track user progression through your product lifecycle:
 ```tsx
 'use client'
 
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 
 function OnboardingComplete() {
   const { activate } = useOutlit()
@@ -560,7 +560,7 @@ function PaymentSuccess({ plan, amount }) {
 
 ```tsx
 // app/layout.tsx
-import { OutlitProvider } from '@outlit/tracker/react'
+import { OutlitProvider } from '@outlit/browser/react'
 
 export default function RootLayout({ children }) {
   return (
@@ -582,7 +582,7 @@ export default function RootLayout({ children }) {
 // app/dashboard/page.tsx
 'use client'
 
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 import { useEffect } from 'react'
 
 export default function Dashboard() {
@@ -600,7 +600,7 @@ export default function Dashboard() {
 
 ```tsx
 // pages/_app.tsx
-import { OutlitProvider } from '@outlit/tracker/react'
+import { OutlitProvider } from '@outlit/browser/react'
 
 export default function App({ Component, pageProps }) {
   return (
@@ -615,7 +615,7 @@ export default function App({ Component, pageProps }) {
 
 ```tsx
 // app/root.tsx
-import { OutlitProvider } from '@outlit/tracker/react'
+import { OutlitProvider } from '@outlit/browser/react'
 
 export default function App() {
   return (
@@ -637,7 +637,7 @@ export default function App() {
 Track when a component mounts (e.g., page viewed):
 
 ```tsx
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 import { useEffect } from 'react'
 
 function ProductPage({ productId }) {
@@ -656,7 +656,7 @@ function ProductPage({ productId }) {
 Track custom form events:
 
 ```tsx
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 
 function ContactForm() {
   const { track, identify } = useOutlit()
@@ -699,7 +699,7 @@ function ContactForm() {
 If you can't use the `user` prop (e.g., the provider is in a different part of the tree), you can sync manually:
 
 ```tsx
-import { useOutlit } from '@outlit/tracker/react'
+import { useOutlit } from '@outlit/browser/react'
 import { useUser } from '@/hooks/use-user' // Your auth hook
 
 function AuthObserver() {
@@ -738,7 +738,7 @@ import {
   type OutlitProviderProps,
   type UseOutlitReturn,
   type UserIdentity,
-} from '@outlit/tracker/react'
+} from '@outlit/browser/react'
 
 // Types are inferred
 const { track, identify, setUser } = useOutlit()

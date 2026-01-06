@@ -57,7 +57,7 @@ Traditional analytics tools show you what happened on your website. Outlit shows
     First-class React support with hooks and context.
     
     ```tsx
-    import { OutlitProvider } from '@outlit/tracker/react'
+    import { OutlitProvider } from '@outlit/browser/react'
 
     export default function App({ children }) {
       return (
@@ -76,7 +76,7 @@ Traditional analytics tools show you what happened on your website. Outlit shows
     Server-side tracking for authenticated users.
     
     ```typescript
-    import { Outlit } from '@outlit/tracker-node'
+    import { Outlit } from '@outlit/browser-node'
 
     const outlit = new Outlit({ publicKey: 'pk_your_key' })
 
