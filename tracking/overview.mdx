@@ -8,7 +8,6 @@ description: "Understand how Outlit captures and connects customer journey data"
 Most businesses track customer data in silos:
 - **Website analytics** shows anonymous pageviews
 - **Product analytics** shows authenticated user behavior
-- **CRM** shows deals and conversations
 - **Billing** shows payment events
 
 Outlit connects all of these into a unified customer timeline.
@@ -22,8 +21,7 @@ flowchart LR
     B -->|identify call| C[Known Contact]
     C --> D[Customer Timeline]
     E[Server Events] -->|email/userId| C
-    F[CRM Sync] --> D
-    G[Billing Events] --> D
+    F[Billing Events] --> D
 ```
 
 ### Browser Tracking (Anonymous Phase)
