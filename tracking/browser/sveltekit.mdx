@@ -147,7 +147,7 @@ Track navigation with SvelteKit's stores:
 ```svelte
 <!-- src/routes/+layout.svelte -->
 <script>
-  import { page } from '$app/stores'
+  import { afterNavigate } from '$app/navigation'
   import { browser } from '$app/environment'
   import outlit from '@outlit/browser'
   import { onMount } from 'svelte'
@@ -161,13 +161,14 @@ Track navigation with SvelteKit's stores:
     }
   })
 
-  $: if (browser && $page.url) {
-    outlit.track('pageview', {
-      path: $page.url.pathname,
-      params: $page.params,
-      query: Object.fromEntries($page.url.searchParams)
-    })
-  }
+  afterNavigate(({ to }) => {
+    if (browser && to) {
+      outlit.track('pageview', {
+        path: to.url.pathname,
+        params: to.params
+      })
+    }
+  })
 </script>
 
 <slot />

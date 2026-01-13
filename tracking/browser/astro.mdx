@@ -43,11 +43,11 @@ const PUBLIC_OUTLIT_KEY = import.meta.env.PUBLIC_OUTLIT_KEY
   <body>
     <slot />
 
-    <script define:vars={{ PUBLIC_OUTLIT_KEY }}>
+    <script>
       import outlit from '@outlit/browser'
 
       outlit.init({
-        publicKey: PUBLIC_OUTLIT_KEY,
+        publicKey: import.meta.env.PUBLIC_OUTLIT_KEY,
         trackPageviews: true,
       })
     </script>
@@ -336,11 +336,13 @@ const product = await fetchProduct(id)
 <html>
   <body>
     <h1>{product.name}</h1>
+    <div id="product-data" data-product-id={id} style="display: none;"></div>
 
-    <script define:vars={{ productId: id }}>
+    <script>
       import outlit from '@outlit/browser'
 
       // Track product view
+      const productId = document.getElementById('product-data')?.dataset.productId
       outlit.track('product_viewed', {
         productId
       })
@@ -364,14 +366,16 @@ const entry = await getEntry('blog', Astro.params.slug)
 <article>
   <h1>{entry.data.title}</h1>
   <div set:html={entry.body} />
+  <div id="blog-data" data-slug={Astro.params.slug} data-title={entry.data.title} style="display: none;"></div>
 </article>
 
-<script define:vars={{ slug: Astro.params.slug, title: entry.data.title }}>
+<script>
   import outlit from '@outlit/browser'
 
+  const blogData = document.getElementById('blog-data')
   outlit.track('blog_post_viewed', {
-    slug,
-    title
+    slug: blogData?.dataset.slug,
+    title: blogData?.dataset.title
   })
 </script>
 ```

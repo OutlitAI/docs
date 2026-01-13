@@ -195,7 +195,7 @@ Track navigation with Angular Router:
 ```typescript
 // src/app/app.config.ts
 import { ApplicationConfig, APP_INITIALIZER } from '@angular/core'
-import { provideRouter, Router } from '@angular/router'
+import { provideRouter, Router, NavigationEnd } from '@angular/router'
 import { OutlitService } from './services/outlit.service'
 import { routes } from './app.routes'
 
@@ -342,37 +342,30 @@ Track API calls:
 
 ```typescript
 // src/app/interceptors/tracking.interceptor.ts
-import { Injectable } from '@angular/core'
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http'
-import { Observable } from 'rxjs'
+import { HttpInterceptorFn, HttpEventType } from '@angular/common/http'
 import { tap } from 'rxjs/operators'
-import { OutlitService } from '../services/outlit.service'
+import outlit from '@outlit/browser'
 
-@Injectable()
-export class TrackingInterceptor implements HttpInterceptor {
-  constructor(private outlit: OutlitService) {}
-
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return next.handle(req).pipe(
-      tap({
-        next: (event) => {
-          if (event.type === 4) { // HttpResponse
-            this.outlit.track('api_success', {
-              url: req.url,
-              method: req.method
-            })
-          }
-        },
-        error: (error) => {
-          this.outlit.track('api_error', {
+export const trackingInterceptor: HttpInterceptorFn = (req, next) => {
+  return next(req).pipe(
+    tap({
+      next: (event) => {
+        if (event.type === HttpEventType.Response) {
+          outlit.track('api_success', {
             url: req.url,
-            method: req.method,
-            status: error.status
+            method: req.method
           })
         }
-      })
-    )
-  }
+      },
+      error: (error) => {
+        outlit.track('api_error', {
+          url: req.url,
+          method: req.method,
+          status: error.status
+        })
+      }
+    })
+  )
 }
 ```
 
@@ -382,12 +375,12 @@ Register the interceptor:
 // src/app/app.config.ts
 import { ApplicationConfig } from '@angular/core'
 import { provideHttpClient, withInterceptors } from '@angular/common/http'
-import { TrackingInterceptor } from './interceptors/tracking.interceptor'
+import { trackingInterceptor } from './interceptors/tracking.interceptor'
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(
-      withInterceptors([TrackingInterceptor])
+      withInterceptors([trackingInterceptor])
     )
   ]
 }
