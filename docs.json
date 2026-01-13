@@ -12,6 +12,9 @@
 		"strict": false
 	},
 	"favicon": "/favicon.svg",
+	"contextual": {
+		"options": ["copy", "chatgpt", "claude", "cursor", "vscode"]
+	},
 	"navigation": {
 		"tabs": [
 			{
