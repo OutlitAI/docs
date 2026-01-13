@@ -27,6 +27,12 @@
 							"tracking/browser/script",
 							"tracking/browser/npm",
 							"tracking/browser/react",
+							"tracking/browser/vue",
+							"tracking/browser/nextjs",
+							"tracking/browser/nuxt",
+							"tracking/browser/sveltekit",
+							"tracking/browser/astro",
+							"tracking/browser/angular",
 							"tracking/browser/calendar-embeds"
 						]
 					},
@@ -57,7 +63,7 @@
 			"anchors": [
 				{
 					"anchor": "GitHub",
-					"href": "https://github.com/outlit",
+					"href": "https://github.com/OutlitAI",
 					"icon": "github"
 				}
 			]
@@ -82,7 +88,7 @@
 	},
 	"footer": {
 		"socials": {
-			"github": "https://github.com/outlit",
+			"github": "https://github.com/OutlitAI",
 			"linkedin": "https://linkedin.com/company/outlit"
 		}
 	}

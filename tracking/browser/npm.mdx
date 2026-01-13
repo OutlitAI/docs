@@ -7,7 +7,7 @@ description: "Full control over tracking with the npm package"
 
 <CodeGroup>
 ```bash npm
-npm install @outlit/browser
+npm install --save @outlit/browser
 ```
 
 ```bash pnpm
@@ -16,6 +16,10 @@ pnpm add @outlit/browser
 
 ```bash yarn
 yarn add @outlit/browser
+```
+
+```bash bun
+bun add @outlit/browser
 ```
 </CodeGroup>
 
@@ -40,7 +44,7 @@ outlit.init({
 ### Configuration Options
 
 <ParamField path="publicKey" type="string" required>
-  Your organization's public key from Settings → Website Tracking.
+  Your organization's public key from [Settings → Website Tracking](https://app.outlit.ai/workspace-profile/tracking).
 </ParamField>
 
 <ParamField path="apiHost" type="string" default="https://app.outlit.ai">
