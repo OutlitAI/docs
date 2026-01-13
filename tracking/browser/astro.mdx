@@ -268,12 +268,7 @@ import { ViewTransitions } from 'astro:transitions'
         trackPageviews: false, // Manual tracking
       })
 
-      // Track initial pageview
-      outlit.track('pageview', {
-        path: window.location.pathname
-      })
-
-      // Track navigation with View Transitions
+      // Track pageviews (fires on initial load and navigation with View Transitions)
       document.addEventListener('astro:page-load', () => {
         outlit.track('pageview', {
           path: window.location.pathname
