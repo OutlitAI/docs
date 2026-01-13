@@ -7,8 +7,8 @@ description: "Set up customer journey tracking in under 5 minutes"
 
 Before you begin, you'll need:
 
-<Check>An Outlit account with an organization</Check>
-<Check>Your public key from Settings → Website Tracking</Check>
+- An Outlit account with an organization
+- Your public key from [Settings → Website Tracking](https://app.outlit.ai/workspace-profile/tracking)
 
 ## Step 1: Add the Tracker
 
@@ -33,13 +33,23 @@ Choose your preferred integration method:
   <Tab title="NPM">
     Install the package:
 
-    ```bash
-    npm install @outlit/browser
-    # or
+    <CodeGroup>
+    ```bash npm
+    npm install --save @outlit/browser
+    ```
+
+    ```bash pnpm
     pnpm add @outlit/browser
-    # or
+    ```
+
+    ```bash yarn
     yarn add @outlit/browser
     ```
+
+    ```bash bun
+    bun add @outlit/browser
+    ```
+    </CodeGroup>
 
     Initialize once at app startup:
 
@@ -52,9 +62,23 @@ Choose your preferred integration method:
   <Tab title="React">
     Install the package:
 
-    ```bash
-    npm install @outlit/browser
+    <CodeGroup>
+    ```bash npm
+    npm install --save @outlit/browser
     ```
+
+    ```bash pnpm
+    pnpm add @outlit/browser
+    ```
+
+    ```bash yarn
+    yarn add @outlit/browser
+    ```
+
+    ```bash bun
+    bun add @outlit/browser
+    ```
+    </CodeGroup>
 
     Wrap your app with the provider:
 
