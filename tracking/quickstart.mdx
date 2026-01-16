@@ -16,18 +16,25 @@ Choose your preferred integration method:
 
 <Tabs>
   <Tab title="Script Tag">
-    Add this script tag before the closing `</body>` tag on every page:
+    Add this snippet before the closing `</body>` tag on every page:
 
     ```html
-    <script
-      src="https://cdn.outlit.ai/stable/outlit.js"
-      data-public-key="pk_your_public_key_here"
-      async
-    ></script>
+    <script>
+      !function(w,d,src,key,auto){
+        if(w.outlit&&w.outlit._loaded)return;
+        w.outlit=w.outlit||{_q:[]};
+        ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId","setUser","clearUser","activate","engaged","paid","churned"].forEach(function(m){
+          w.outlit[m]=w.outlit[m]||function(){w.outlit._q.push([m,[].slice.call(arguments)])};
+        });
+        var s=d.createElement("script");s.async=1;s.src=src;
+        s.dataset.publicKey=key;if(auto!==undefined)s.dataset.autoTrack=auto;
+        (d.body||d.head).appendChild(s);
+      }(window,document,"https://cdn.outlit.ai/stable/outlit.js","pk_your_public_key_here");
+    </script>
     ```
 
     <Tip>
-      Replace `pk_your_public_key_here` with your actual public key from Settings.
+      Replace `pk_your_public_key_here` with your actual public key from Settings. This snippet queues any tracking calls made before the SDK loads, so you can safely call `outlit.track()` anywhere on the page.
     </Tip>
   </Tab>
   <Tab title="NPM">
