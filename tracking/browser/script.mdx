@@ -306,20 +306,26 @@ const visitorId = window.outlit.getVisitorId()
 
 ## Queued Commands
 
-The tracker supports commands even before it fully loads. Commands are queued and executed once ready:
+The IIFE snippet creates stub methods that queue all tracking calls until the SDK fully loads. This means you can call `outlit.track()`, `outlit.identify()`, or any other method immediately—even in inline scripts before the SDK has finished loading:
 
 ```html
 <script>
-  // This works even before the script loads
-  window.outlit = window.outlit || { _queue: [] };
-  window.outlit.track('early_event', { page: 'landing' });
+  !function(w,d,src,key,auto){
+    if(w.outlit&&w.outlit._loaded)return;
+    w.outlit=w.outlit||{_q:[]};
+    ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId","setUser","clearUser","activate","engaged","paid","churned"].forEach(function(m){
+      w.outlit[m]=w.outlit[m]||function(){w.outlit._q.push([m,[].slice.call(arguments)])};
+    });
+    var s=d.createElement("script");s.async=1;s.src=src;
+    s.dataset.publicKey=key;if(auto!==undefined)s.dataset.autoTrack=auto;
+    (d.body||d.head).appendChild(s);
+  }(window,document,"https://cdn.outlit.ai/stable/outlit.js","pk_your_public_key");
 </script>
 
-<script
-  src="https://cdn.outlit.ai/stable/outlit.js"
-  data-public-key="pk_xxx"
-  async
-></script>
+<!-- This works immediately, even before the SDK loads -->
+<script>
+  window.outlit.track('early_event', { page: 'landing' });
+</script>
 ```
 
 ## Event Batching
@@ -368,11 +374,18 @@ For performance, events are batched and sent:
     });
   </script>
 
-  <script
-    src="https://cdn.outlit.ai/stable/outlit.js"
-    data-public-key="pk_your_public_key"
-    async
-  ></script>
+  <script>
+    !function(w,d,src,key,auto){
+      if(w.outlit&&w.outlit._loaded)return;
+      w.outlit=w.outlit||{_q:[]};
+      ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId","setUser","clearUser","activate","engaged","paid","churned"].forEach(function(m){
+        w.outlit[m]=w.outlit[m]||function(){w.outlit._q.push([m,[].slice.call(arguments)])};
+      });
+      var s=d.createElement("script");s.async=1;s.src=src;
+      s.dataset.publicKey=key;if(auto!==undefined)s.dataset.autoTrack=auto;
+      (d.body||d.head).appendChild(s);
+    }(window,document,"https://cdn.outlit.ai/stable/outlit.js","pk_your_public_key");
+  </script>
 </body>
 </html>
 ```
