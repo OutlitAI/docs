@@ -22,7 +22,7 @@
 				"groups": [
 					{
 						"group": "Getting Started",
-						"pages": ["index", "tracking/overview", "tracking/quickstart"]
+						"pages": ["index", "tracking/overview", "tracking/quickstart", "tracking/stages"]
 					},
 					{
 						"group": "Browser Tracking",
