@@ -41,8 +41,8 @@ Each person (contact) progresses through stages based on their product engagemen
 |-------|---------|--------------|
 | **Discovered** | Email known, hasn't signed up yet | Automatic |
 | **Signed Up** | Created an account | Automatic |
-| **Activated** | Completed onboarding or key milestone | Call `activate()` |
-| **Engaged** | Actively using the product | Automatic or `engaged()` |
+| **Activated** | Completed onboarding or key milestone | Call `user.activate()` |
+| **Engaged** | Actively using the product | Automatic or `user.engaged()` |
 | **Inactive** | No activity for extended period | Automatic |
 
 <Info>
@@ -103,10 +103,10 @@ The difference is determined by the identifiers you provide:
 
 Outlit monitors user activity and automatically advances contacts to Engaged when they show consistent usage—active on multiple distinct days within a rolling time window.
 
-You don't need to call `engaged()` manually in most cases. However, you can call it explicitly for specific milestones:
+You don't need to call `user.engaged()` manually in most cases. However, you can call it explicitly for specific milestones:
 
 ```typescript
-outlit.engaged({ milestone: 'completed_first_project' })
+outlit.user.engaged({ milestone: 'completed_first_project' })
 ```
 
 #### Automatic Inactivity
@@ -119,12 +119,12 @@ Outlit automatically marks contacts as Inactive when they haven't had any produc
 
 ### Manual Stage Methods
 
-#### activate()
+#### user.activate()
 
 Mark a contact as activated after they complete onboarding:
 
 ```typescript
-outlit.activate({
+outlit.user.activate({
   flow: 'onboarding',
   completedSteps: ['profile', 'first_action', 'invite_team']
 })
@@ -135,12 +135,12 @@ outlit.activate({
 - User performs a key "aha moment" action
 - User reaches your definition of activation
 
-#### engaged()
+#### user.engaged()
 
 While engagement is calculated automatically, you can explicitly mark it for specific milestones:
 
 ```typescript
-outlit.engaged({
+outlit.user.engaged({
   milestone: 'power_user',
   actionsThisWeek: 50
 })
@@ -214,16 +214,18 @@ Stage methods are also available in the server SDK:
 ### Contact Journey (Server)
 
 ```typescript
-import { outlit } from '@outlit/node'
+import { Outlit } from '@outlit/node'
+
+const outlit = new Outlit({ publicKey: 'pk_xxx' })
 
 // After user completes onboarding
-outlit.activate({
+outlit.user.activate({
   email: 'jane@example.com',
   properties: { flow: 'onboarding' }
 })
 
 // When user hits engagement milestone
-outlit.engaged({
+outlit.user.engaged({
   userId: 'usr_12345',
   properties: { milestone: 'first_project_created' }
 })
@@ -286,14 +288,14 @@ Stage methods should be called when the action is **confirmed**:
 ```typescript
 // Bad: Called when user clicks "Complete"
 function handleOnboardingClick() {
-  outlit.activate() // Too early!
+  outlit.user.activate() // Too early!
   completeOnboarding()
 }
 
 // Good: Called after onboarding is confirmed complete
 async function handleOnboardingComplete() {
   await saveOnboardingProgress()
-  outlit.activate({ flow: 'onboarding_v2' })
+  outlit.user.activate({ flow: 'onboarding_v2' })
 }
 ```
 
@@ -303,10 +305,10 @@ Properties help you analyze stage transitions:
 
 ```typescript
 // Sparse — hard to analyze
-outlit.activate()
+outlit.user.activate()
 
 // Rich — enables funnel analysis
-outlit.activate({
+outlit.user.activate({
   flow: 'onboarding_v2',
   timeToActivate: 3600,
   completedSteps: ['profile', 'first_project'],

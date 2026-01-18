@@ -279,11 +279,11 @@ Track contact lifecycle events:
 
   onMount(() => {
     // Track activation after onboarding
-    outlit.activate({ flow: 'onboarding', step: 'completed' })
+    outlit.user.activate({ flow: 'onboarding', step: 'completed' })
   })
 
   function handleEngagementMilestone() {
-    outlit.engaged({ milestone: 'first_project' })
+    outlit.user.engaged({ milestone: 'first_project' })
   }
 </script>
 

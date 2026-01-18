@@ -210,20 +210,28 @@ outlit.clearUser()
 
 Track contact progression through your product lifecycle. These require the user to be identified first (via `setUser()` or `identify()`).
 
-#### `outlit.activate(properties?)`
+#### `outlit.user.activate(properties?)`
 
 Mark the current user as activated. Typically called after a user completes onboarding or a key activation milestone.
 
 ```typescript
-outlit.activate({ flow: 'onboarding', step: 'completed' })
+outlit.user.activate({ flow: 'onboarding', step: 'completed' })
 ```
 
-#### `outlit.engaged(properties?)`
+#### `outlit.user.engaged(properties?)`
 
 Mark the current user as engaged. Typically called when a user reaches a usage milestone.
 
 ```typescript
-outlit.engaged({ milestone: 'first_project_created' })
+outlit.user.engaged({ milestone: 'first_project_created' })
+```
+
+#### `outlit.user.inactive(properties?)`
+
+Mark the current user as inactive. Use this when a user's engagement lapses.
+
+```typescript
+outlit.user.inactive({ reason: 'no_login_30_days' })
 ```
 
 <Warning>
