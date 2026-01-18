@@ -206,9 +206,9 @@ Clear the current user identity. Call this when the user logs out.
 outlit.clearUser()
 ```
 
-### Journey Stage Methods
+### Contact Stage Methods
 
-Track user progression through your product lifecycle. These require the user to be identified first (via `setUser()` or `identify()`).
+Track contact progression through your product lifecycle. These require the user to be identified first (via `setUser()` or `identify()`).
 
 #### `outlit.activate(properties?)`
 
@@ -226,25 +226,13 @@ Mark the current user as engaged. Typically called when a user reaches a usage m
 outlit.engaged({ milestone: 'first_project_created' })
 ```
 
-#### `outlit.paid(properties?)`
-
-Mark the current user as paid. Typically called after a successful payment or subscription.
-
-```typescript
-outlit.paid({ plan: 'pro', amount: 99 })
-```
-
-#### `outlit.churned(properties?)`
-
-Mark the current user as churned. Typically called when a subscription is cancelled.
-
-```typescript
-outlit.churned({ reason: 'too_expensive' })
-```
-
 <Warning>
   Stage methods require the user to be identified first. If called without a user identity, a warning is logged and the event is not sent.
 </Warning>
+
+<Info>
+  Account billing status (`paid`, `churned`, `trialing`) is tracked separately at the account level. If you've connected Stripe, this is handled automatically. For manual billing tracking from your server, see [Stages & Billing](/tracking/stages).
+</Info>
 
 ### `outlit.getInstance()`
 

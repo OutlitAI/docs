@@ -92,9 +92,9 @@ outlit.identify({
 })
 ```
 
-### Journey Stage Events
+### Contact Stage Events
 
-Track user progression through your product lifecycle:
+Track contact progression through your product lifecycle:
 
 ```typescript
 // After user completes onboarding
@@ -102,16 +102,10 @@ outlit.activate({ flow: 'onboarding' })
 
 // When user reaches an engagement milestone
 outlit.engaged({ milestone: 'first_project' })
-
-// After successful payment
-outlit.paid({ plan: 'pro', amount: 99 })
-
-// When subscription is cancelled
-outlit.churned({ reason: 'too_expensive' })
 ```
 
 <Info>
-  Stage events require the user to be identified first (via `identify()` or `setUser()`). The `discovered` and `signed_up` stages are automatically inferred from identify calls.
+  Contact stage events require the user to be identified first (via `identify()` or `setUser()`). The `discovered` and `signed_up` stages are automatically inferred from identify calls. Account billing (`trialing`, `paying`, `churned`) is tracked separately—see [Stages & Billing](/tracking/stages).
 </Info>
 
 ## Privacy & Security

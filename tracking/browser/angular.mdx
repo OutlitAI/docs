@@ -104,14 +104,6 @@ export class OutlitService {
     outlit.engaged(properties)
   }
 
-  paid(properties?: Record<string, any>): void {
-    outlit.paid(properties)
-  }
-
-  churned(properties?: Record<string, any>): void {
-    outlit.churned(properties)
-  }
-
   getVisitorId(): string | null {
     return outlit.getInstance().getVisitorId()
   }
@@ -386,9 +378,9 @@ export const appConfig: ApplicationConfig = {
 }
 ```
 
-## Journey Stage Events
+## Contact Stage Events
 
-Track user lifecycle:
+Track contact lifecycle:
 
 ```typescript
 // src/app/components/onboarding/onboarding.component.ts
@@ -418,8 +410,12 @@ export class OnboardingComponent {
 ```
 
 <Warning>
-  Stage methods (`activate`, `engaged`, `paid`, `churned`) require the user to be identified first.
+  Stage methods (`activate`, `engaged`) require the user to be identified first.
 </Warning>
+
+<Info>
+  Account billing (`paid`, `churned`, `trialing`) is tracked separately. If you've connected Stripe, billing is automatic. For manual billing, see [Stages & Billing](/tracking/stages).
+</Info>
 
 ## Consent Management
 

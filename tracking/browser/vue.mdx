@@ -241,9 +241,9 @@ export const useUserStore = defineStore('user', {
 
 For Nuxt applications, see the dedicated [Nuxt integration guide](/tracking/browser/nuxt).
 
-## Journey Stage Events
+## Contact Stage Events
 
-Track user lifecycle events:
+Track contact lifecycle events:
 
 ```vue
 <script setup>
@@ -255,15 +255,19 @@ onMounted(() => {
   outlit.activate({ flow: 'onboarding' })
 })
 
-function handleSubscribe(plan: string) {
-  outlit.paid({ plan, amount: 99 })
+function handleEngagementMilestone() {
+  outlit.engaged({ milestone: 'first_project' })
 }
 </script>
 ```
 
 <Warning>
-  Stage methods (`activate`, `engaged`, `paid`, `churned`) require the user to be identified first using `identify()` or `setUser()`.
+  Stage methods (`activate`, `engaged`) require the user to be identified first using `identify()` or `setUser()`.
 </Warning>
+
+<Info>
+  Account billing (`paid`, `churned`, `trialing`) is tracked separately. If you've connected Stripe, billing is automatic. For manual billing, see [Stages & Billing](/tracking/stages).
+</Info>
 
 ## Consent Management
 
