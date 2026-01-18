@@ -167,13 +167,13 @@ outlit.identify({
   Properties to update on the user profile.
 </ParamField>
 
-### Journey Stage Methods
+### Contact Stage Methods
 
-Track user progression through your product lifecycle. All stage methods require either `email` or `userId`.
+Track contact progression through your product lifecycle. These methods require either `email` or `userId`.
 
 #### `outlit.activate(options)`
 
-Mark a user as activated. Typically called after a user completes onboarding or a key activation milestone.
+Mark a contact as activated. Typically called after a user completes onboarding or a key activation milestone.
 
 ```typescript
 outlit.activate({
@@ -184,7 +184,7 @@ outlit.activate({
 
 #### `outlit.engaged(options)`
 
-Mark a user as engaged. Typically called when a user reaches a usage milestone. Can also be computed automatically by the engagement cron.
+Mark a contact as engaged. Typically called when a user reaches a usage milestone. Can also be computed automatically based on activity.
 
 ```typescript
 outlit.engaged({
@@ -193,30 +193,49 @@ outlit.engaged({
 })
 ```
 
-#### `outlit.paid(options)`
+<Info>
+  The `discovered` and `signed_up` stages are automatically inferred from identify calls.
+</Info>
 
-Mark a user as paid. Typically called after a successful payment or subscription.
+### Account Billing Methods
+
+Track account billing status. These methods target the account (by domain), not individual contacts. If you've connected Stripe, billing is handled automatically.
+
+#### `outlit.customer.trialing(options)`
+
+Mark an account as trialing.
 
 ```typescript
-outlit.paid({
-  email: 'user@example.com',
+outlit.customer.trialing({
+  domain: 'acme.com',
+  properties: { trialEndsAt: '2024-02-15' }
+})
+```
+
+#### `outlit.customer.paid(options)`
+
+Mark an account as paying.
+
+```typescript
+outlit.customer.paid({
+  domain: 'acme.com',
   properties: { plan: 'pro', amount: 99 }
 })
 ```
 
-#### `outlit.churned(options)`
+#### `outlit.customer.churned(options)`
 
-Mark a user as churned. Typically called when a subscription is cancelled.
+Mark an account as churned.
 
 ```typescript
-outlit.churned({
-  email: 'user@example.com',
+outlit.customer.churned({
+  domain: 'acme.com',
   properties: { reason: 'cancelled_by_user' }
 })
 ```
 
 <Info>
-  The `discovered` and `signed_up` stages are automatically inferred from identify calls. You only need to explicitly call `activate()`, `engaged()`, `paid()`, or `churned()`.
+  Billing methods target accounts by domain. All contacts under that domain share the same billing status. See [Stages & Billing](/tracking/stages) for details on how contact stages and account billing work together.
 </Info>
 
 ### `outlit.flush()`
@@ -292,7 +311,7 @@ import { Outlit } from '@outlit/node'
 const outlit = new Outlit({ publicKey: process.env.OUTLIT_KEY! })
 
 export async function POST(request: Request) {
-  const { userId, email, newPlan, amount } = await request.json()
+  const { userId, email, newPlan, amount, domain } = await request.json()
 
   // Your upgrade logic
   await upgradeSubscription(userId, newPlan)
@@ -305,9 +324,9 @@ export async function POST(request: Request) {
     properties: { plan: newPlan }
   })
 
-  // Mark as paid
-  outlit.paid({
-    email,
+  // Update account billing status
+  outlit.customer.paid({
+    domain,
     properties: { plan: newPlan, amount }
   })
 
@@ -347,6 +366,10 @@ export async function handler(event) {
 
 ### Stripe Webhooks
 
+<Info>
+  If you've connected Stripe to Outlit, billing status is handled automatically—you don't need to implement webhook handling yourself. The example below is only needed for custom billing logic.
+</Info>
+
 Track payment and subscription events from Stripe:
 
 ```typescript
@@ -359,9 +382,11 @@ export async function handleStripeWebhook(event: Stripe.Event) {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
-      if (session.customer_email) {
-        outlit.paid({
-          email: session.customer_email,
+      // Get account domain from your database
+      const domain = await getAccountDomain(session.customer)
+      if (domain) {
+        outlit.customer.paid({
+          domain,
           properties: {
             amount: session.amount_total ? session.amount_total / 100 : undefined,
             currency: session.currency,
@@ -373,11 +398,11 @@ export async function handleStripeWebhook(event: Stripe.Event) {
 
     case 'customer.subscription.deleted': {
       const subscription = event.data.object as Stripe.Subscription
-      // Get customer email from your database
-      const customerEmail = await getCustomerEmail(subscription.customer)
-      if (customerEmail) {
-        outlit.churned({
-          email: customerEmail,
+      // Get account domain from your database
+      const domain = await getAccountDomain(subscription.customer)
+      if (domain) {
+        outlit.customer.churned({
+          domain,
           properties: {
             reason: subscription.cancellation_details?.reason,
           }
@@ -460,7 +485,8 @@ import {
   type OutlitOptions,
   type ServerTrackOptions,
   type ServerIdentifyOptions,
-  type StageOptions,
+  type ContactStageOptions,
+  type AccountBillingOptions,
 } from '@outlit/node'
 
 const options: OutlitOptions = {
@@ -478,13 +504,21 @@ const trackOptions: ServerTrackOptions = {
 
 outlit.track(trackOptions)
 
-// Stage options
-const stageOptions: StageOptions = {
+// Contact stage options
+const stageOptions: ContactStageOptions = {
   email: 'user@test.com',
+  properties: { flow: 'onboarding' }
+}
+
+outlit.activate(stageOptions)
+
+// Account billing options
+const billingOptions: AccountBillingOptions = {
+  domain: 'acme.com',
   properties: { plan: 'pro' }
 }
 
-outlit.paid(stageOptions)
+outlit.customer.paid(billingOptions)
 ```
 
 ## Next Steps

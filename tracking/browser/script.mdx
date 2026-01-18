@@ -277,9 +277,9 @@ Call when the user logs out:
 window.outlit.clearUser()
 ```
 
-### Journey Stage Methods
+### Contact Stage Methods
 
-Track user progression through your product lifecycle. These require the user to be identified first (via `setUser()` or `identify()`).
+Track contact progression through your product lifecycle. These require the user to be identified first (via `setUser()` or `identify()`).
 
 ```javascript
 // After user completes onboarding
@@ -287,13 +287,11 @@ window.outlit.activate({ flow: 'onboarding' })
 
 // When user reaches an engagement milestone
 window.outlit.engaged({ milestone: 'first_project' })
-
-// After successful payment
-window.outlit.paid({ plan: 'pro', amount: 99 })
-
-// When subscription is cancelled
-window.outlit.churned({ reason: 'too_expensive' })
 ```
+
+<Info>
+  Account billing status (`paid`, `churned`, `trialing`) is tracked separately at the account level. If you've connected Stripe, this is handled automatically. For manual billing tracking, see [Stages & Billing](/tracking/stages).
+</Info>
 
 ### Get Visitor ID
 
