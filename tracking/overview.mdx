@@ -98,10 +98,10 @@ Track contact progression through your product lifecycle:
 
 ```typescript
 // After user completes onboarding
-outlit.activate({ flow: 'onboarding' })
+outlit.user.activate({ flow: 'onboarding' })
 
 // When user reaches an engagement milestone
-outlit.engaged({ milestone: 'first_project' })
+outlit.user.engaged({ milestone: 'first_project' })
 ```
 
 <Info>

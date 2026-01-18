@@ -402,10 +402,8 @@ function MyComponent() {
     identify,
     setUser,
     clearUser,
-    activate,
-    engaged,
-    paid,
-    churned,
+    user,       // User stage methods: identify, activate, engaged, inactive
+    customer,   // Customer billing methods: trialing, paid, churned
     getVisitorId,
     isInitialized,
     isTrackingEnabled,
@@ -417,6 +415,13 @@ function MyComponent() {
 
   // Identify the user
   identify({ email: 'user@example.com', traits: { plan: 'pro' } })
+
+  // User stage methods
+  user.activate({ flow: 'onboarding' })
+  user.engaged({ milestone: 'first_project' })
+
+  // Customer billing methods (requires account identifier)
+  customer.paid({ domain: 'acme.com', plan: 'pro' })
 
   // Get visitor ID (null if tracking not enabled)
   const visitorId = getVisitorId()
@@ -446,20 +451,19 @@ function MyComponent() {
   Clear the current user identity (on logout).
 </ParamField>
 
-<ParamField path="activate" type="(properties?: object) => void">
-  Mark the current user as activated.
+<ParamField path="user" type="object">
+  User stage methods namespace:
+  - `user.identify(options)` - Identify the user
+  - `user.activate(properties?)` - Mark user as activated
+  - `user.engaged(properties?)` - Mark user as engaged
+  - `user.inactive(properties?)` - Mark user as inactive
 </ParamField>
 
-<ParamField path="engaged" type="(properties?: object) => void">
-  Mark the current user as engaged.
-</ParamField>
-
-<ParamField path="paid" type="(properties?: object) => void">
-  Mark the current user as paid.
-</ParamField>
-
-<ParamField path="churned" type="(properties?: object) => void">
-  Mark the current user as churned.
+<ParamField path="customer" type="object">
+  Customer billing methods namespace. Requires at least one of `domain`, `customerId`, or `stripeCustomerId`:
+  - `customer.trialing(options)` - Mark account as trialing
+  - `customer.paid(options)` - Mark account as paid
+  - `customer.churned(options)` - Mark account as churned
 </ParamField>
 
 <ParamField path="getVisitorId" type="() => string | null">
@@ -531,10 +535,10 @@ Track user progression through your product lifecycle:
 import { useOutlit } from '@outlit/browser/react'
 
 function OnboardingComplete() {
-  const { activate } = useOutlit()
+  const { user } = useOutlit()
 
   const handleComplete = () => {
-    activate({ flow: 'onboarding', step: 'completed' })
+    user.activate({ flow: 'onboarding', step: 'completed' })
   }
 
   return <button onClick={handleComplete}>Complete Setup</button>
@@ -542,21 +546,25 @@ function OnboardingComplete() {
 ```
 
 ```tsx
-// After a successful payment
-function PaymentSuccess({ plan, amount }) {
-  const { paid } = useOutlit()
+// Track engagement milestone
+function FirstProjectCreated() {
+  const { user } = useOutlit()
 
   useEffect(() => {
-    paid({ plan, amount })
-  }, [plan, amount, paid])
+    user.engaged({ milestone: 'first_project' })
+  }, [user])
 
-  return <div>Payment successful!</div>
+  return <div>Congratulations on your first project!</div>
 }
 ```
 
 <Warning>
-  Stage methods (`activate`, `engaged`, `paid`, `churned`) require the user to be identified first. Use `setUser()`, `identify()`, or the `user` prop before calling stage methods.
+  User stage methods (`user.activate`, `user.engaged`, `user.inactive`) require the user to be identified first. Use `setUser()`, `identify()`, or the `user` prop before calling stage methods.
 </Warning>
+
+<Info>
+  Account billing status (`customer.paid`, `customer.churned`, `customer.trialing`) is tracked separately at the account level. If you've connected Stripe, this is handled automatically. For manual billing tracking from your server, see [Stages & Billing](/tracking/stages).
+</Info>
 
 ## Framework Examples
 

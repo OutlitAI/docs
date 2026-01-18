@@ -252,11 +252,11 @@ import { onMounted } from 'vue'
 
 onMounted(() => {
   // After onboarding completion
-  outlit.activate({ flow: 'onboarding' })
+  outlit.user.activate({ flow: 'onboarding' })
 })
 
 function handleEngagementMilestone() {
-  outlit.engaged({ milestone: 'first_project' })
+  outlit.user.engaged({ milestone: 'first_project' })
 }
 </script>
 ```

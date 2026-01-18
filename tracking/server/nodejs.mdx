@@ -171,25 +171,36 @@ outlit.identify({
 
 Track contact progression through your product lifecycle. These methods require either `email` or `userId`.
 
-#### `outlit.activate(options)`
+#### `outlit.user.activate(options)`
 
 Mark a contact as activated. Typically called after a user completes onboarding or a key activation milestone.
 
 ```typescript
-outlit.activate({
+outlit.user.activate({
   email: 'user@example.com',
   properties: { flow: 'onboarding' }
 })
 ```
 
-#### `outlit.engaged(options)`
+#### `outlit.user.engaged(options)`
 
 Mark a contact as engaged. Typically called when a user reaches a usage milestone. Can also be computed automatically based on activity.
 
 ```typescript
-outlit.engaged({
+outlit.user.engaged({
   userId: 'usr_123',
   properties: { milestone: 'first_project_created' }
+})
+```
+
+#### `outlit.user.inactive(options)`
+
+Mark a contact as inactive. Use this when a user's engagement has lapsed.
+
+```typescript
+outlit.user.inactive({
+  email: 'user@example.com',
+  properties: { reason: 'no_login_30_days' }
 })
 ```
 
@@ -510,7 +521,7 @@ const stageOptions: ContactStageOptions = {
   properties: { flow: 'onboarding' }
 }
 
-outlit.activate(stageOptions)
+outlit.user.activate(stageOptions)
 
 // Account billing options
 const billingOptions: AccountBillingOptions = {

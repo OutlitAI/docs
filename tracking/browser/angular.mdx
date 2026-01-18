@@ -97,11 +97,15 @@ export class OutlitService {
   }
 
   activate(properties?: Record<string, any>): void {
-    outlit.activate(properties)
+    outlit.user.activate(properties)
   }
 
   engaged(properties?: Record<string, any>): void {
-    outlit.engaged(properties)
+    outlit.user.engaged(properties)
+  }
+
+  inactive(properties?: Record<string, any>): void {
+    outlit.user.inactive(properties)
   }
 
   getVisitorId(): string | null {
@@ -399,7 +403,7 @@ export class OnboardingComponent {
   ) {}
 
   handleComplete(): void {
-    this.outlit.activate({
+    outlit.user.activate({
       flow: 'onboarding',
       step: 'completed'
     })

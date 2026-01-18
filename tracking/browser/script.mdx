@@ -15,9 +15,16 @@ Add this snippet before the closing `</body>` tag. This creates a lightweight st
 <script>
   !function(w,d,src,key,auto){
     if(w.outlit&&w.outlit._loaded)return;
-    w.outlit=w.outlit||{_q:[]};
-    ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId","setUser","clearUser","activate","engaged","paid","churned"].forEach(function(m){
-      w.outlit[m]=w.outlit[m]||function(){w.outlit._q.push([m,[].slice.call(arguments)])};
+    var o=w.outlit=w.outlit||{_q:[]};
+    ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId","setUser","clearUser"].forEach(function(m){
+      o[m]=o[m]||function(){o._q.push([m,[].slice.call(arguments)])};
+    });
+    o.user=o.user||{};o.customer=o.customer||{};
+    ["identify","activate","engaged","inactive"].forEach(function(m){
+      o.user[m]=o.user[m]||function(){o._q.push(["user."+m,[].slice.call(arguments)])};
+    });
+    ["trialing","paid","churned"].forEach(function(m){
+      o.customer[m]=o.customer[m]||function(){o._q.push(["customer."+m,[].slice.call(arguments)])};
     });
     var s=d.createElement("script");s.async=1;s.src=src;
     s.dataset.publicKey=key;if(auto!==undefined)s.dataset.autoTrack=auto;
@@ -27,7 +34,7 @@ Add this snippet before the closing `</body>` tag. This creates a lightweight st
 ```
 
 <Tip>
-  This snippet is safe to place anywhere on the page, including in the `<head>`. Calls to `outlit.track()` or `outlit.identify()` will be queued and processed once the SDK loads.
+  This snippet is safe to place anywhere on the page, including in the `<head>`. Calls to `outlit.track()` or `outlit.user.identify()` will be queued and processed once the SDK loads.
 </Tip>
 
 ### Simple Version
@@ -86,9 +93,16 @@ If you're using a consent management platform (CMP) or need to wait for user con
 <script>
   !function(w,d,src,key,auto){
     if(w.outlit&&w.outlit._loaded)return;
-    w.outlit=w.outlit||{_q:[]};
-    ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId"].forEach(function(m){
-      w.outlit[m]=w.outlit[m]||function(){w.outlit._q.push([m,[].slice.call(arguments)])};
+    var o=w.outlit=w.outlit||{_q:[]};
+    ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId","setUser","clearUser"].forEach(function(m){
+      o[m]=o[m]||function(){o._q.push([m,[].slice.call(arguments)])};
+    });
+    o.user=o.user||{};o.customer=o.customer||{};
+    ["identify","activate","engaged","inactive"].forEach(function(m){
+      o.user[m]=o.user[m]||function(){o._q.push(["user."+m,[].slice.call(arguments)])};
+    });
+    ["trialing","paid","churned"].forEach(function(m){
+      o.customer[m]=o.customer[m]||function(){o._q.push(["customer."+m,[].slice.call(arguments)])};
     });
     var s=d.createElement("script");s.async=1;s.src=src;
     s.dataset.publicKey=key;if(auto!==undefined)s.dataset.autoTrack=auto;
@@ -283,10 +297,10 @@ Track contact progression through your product lifecycle. These require the user
 
 ```javascript
 // After user completes onboarding
-window.outlit.activate({ flow: 'onboarding' })
+window.outlit.user.activate({ flow: 'onboarding' })
 
 // When user reaches an engagement milestone
-window.outlit.engaged({ milestone: 'first_project' })
+window.outlit.user.engaged({ milestone: 'first_project' })
 ```
 
 <Info>
@@ -310,9 +324,16 @@ The IIFE snippet creates stub methods that queue all tracking calls until the SD
 <script>
   !function(w,d,src,key,auto){
     if(w.outlit&&w.outlit._loaded)return;
-    w.outlit=w.outlit||{_q:[]};
-    ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId","setUser","clearUser","activate","engaged","paid","churned"].forEach(function(m){
-      w.outlit[m]=w.outlit[m]||function(){w.outlit._q.push([m,[].slice.call(arguments)])};
+    var o=w.outlit=w.outlit||{_q:[]};
+    ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId","setUser","clearUser"].forEach(function(m){
+      o[m]=o[m]||function(){o._q.push([m,[].slice.call(arguments)])};
+    });
+    o.user=o.user||{};o.customer=o.customer||{};
+    ["identify","activate","engaged","inactive"].forEach(function(m){
+      o.user[m]=o.user[m]||function(){o._q.push(["user."+m,[].slice.call(arguments)])};
+    });
+    ["trialing","paid","churned"].forEach(function(m){
+      o.customer[m]=o.customer[m]||function(){o._q.push(["customer."+m,[].slice.call(arguments)])};
     });
     var s=d.createElement("script");s.async=1;s.src=src;
     s.dataset.publicKey=key;if(auto!==undefined)s.dataset.autoTrack=auto;
@@ -375,9 +396,16 @@ For performance, events are batched and sent:
   <script>
     !function(w,d,src,key,auto){
       if(w.outlit&&w.outlit._loaded)return;
-      w.outlit=w.outlit||{_q:[]};
-      ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId","setUser","clearUser","activate","engaged","paid","churned"].forEach(function(m){
-        w.outlit[m]=w.outlit[m]||function(){w.outlit._q.push([m,[].slice.call(arguments)])};
+      var o=w.outlit=w.outlit||{_q:[]};
+      ["init","track","identify","enableTracking","isTrackingEnabled","getVisitorId","setUser","clearUser"].forEach(function(m){
+        o[m]=o[m]||function(){o._q.push([m,[].slice.call(arguments)])};
+      });
+      o.user=o.user||{};o.customer=o.customer||{};
+      ["identify","activate","engaged","inactive"].forEach(function(m){
+        o.user[m]=o.user[m]||function(){o._q.push(["user."+m,[].slice.call(arguments)])};
+      });
+      ["trialing","paid","churned"].forEach(function(m){
+        o.customer[m]=o.customer[m]||function(){o._q.push(["customer."+m,[].slice.call(arguments)])};
       });
       var s=d.createElement("script");s.async=1;s.src=src;
       s.dataset.publicKey=key;if(auto!==undefined)s.dataset.autoTrack=auto;
