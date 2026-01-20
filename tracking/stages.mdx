@@ -12,23 +12,27 @@ Outlit tracks two independent dimensions of your customer relationships:
 
 These are tracked separately because they're independent. A contact can be highly engaged while their company hasn't paid yet, or a company can be paying while a specific team member is inactive.
 
-```mermaid
-%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#6366f1', 'primaryTextColor': '#fff', 'primaryBorderColor': '#4f46e5', 'lineColor': '#818cf8' }}}%%
-flowchart TB
-    subgraph contact["Contact Journey (per person)"]
-        A[Discovered] --> B[Signed Up]
-        B --> C[Activated]
-        C --> D[Engaged]
-        D -.->|no activity| E[Inactive]
-        E -.->|new activity| D
-    end
+### Contact Journey (per person)
 
-    subgraph billing["Account Billing (per company)"]
-        F[None] --> G[Trialing]
-        G --> H[Paying]
-        H -.-> I[Churned]
-        I -.->|re-subscribes| H
-    end
+```mermaid
+%%{init: {'theme': 'dark', 'flowchart': {'nodeSpacing': 50, 'rankSpacing': 60, 'curve': 'basis', 'padding': 15}}}%%
+flowchart LR
+    A([Discovered]) --> B([Signed Up])
+    B --> C([Activated])
+    C --> D([Engaged])
+    D -.->|no activity| E([Inactive])
+    E -.->|new activity| D
+```
+
+### Account Billing (per company)
+
+```mermaid
+%%{init: {'theme': 'dark', 'flowchart': {'nodeSpacing': 50, 'rankSpacing': 60, 'curve': 'basis', 'padding': 15}}}%%
+flowchart LR
+    F([None]) --> G([Trialing])
+    G --> H([Paying])
+    H -.-> I([Churned])
+    I -.->|re-subscribes| H
 ```
 
 ---
