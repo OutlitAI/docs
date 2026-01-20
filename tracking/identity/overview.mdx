@@ -103,15 +103,14 @@ Outlit automatically resolves these identities into unified customer profiles.
 
 ## How Identity Resolution Works
 
-<Frame>
 ```mermaid
+%%{init: {'theme': 'dark', 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 50, 'curve': 'basis', 'padding': 15}}}%%
 flowchart TD
-    A[Anonymous Visit<br/>visitorId: abc-123] -->|identify email| B[CustomerContact<br/>email: jane@acme.com]
-    C[Anonymous Visit<br/>visitorId: xyz-789] -->|identify same email| B
-    D[Server Event<br/>userId: usr_456] -->|same email| B
-    B --> E[Unified Customer Timeline]
+    A([Anonymous Visit<br/>visitorId: abc-123]) -->|identify email| B([CustomerContact<br/>email: jane@acme.com])
+    C([Anonymous Visit<br/>visitorId: xyz-789]) -->|identify same email| B
+    D([Server Event<br/>userId: usr_456]) -->|same email| B
+    B --> E([Unified Customer Timeline])
 ```
-</Frame>
 
 ### Identity Priority
 

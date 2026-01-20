@@ -16,8 +16,8 @@ When someone visits your website for the first time:
 3. **Events tracked** - Pageviews, form views, button clicks
 4. **Stored as AnonymousVisitor** - Ready to be linked later
 
-<Frame>
 ```mermaid
+%%{init: {'theme': 'dark', 'sequence': {'mirrorActors': false, 'messageMargin': 40}}}%%
 sequenceDiagram
     participant V as Visitor
     participant B as Browser
@@ -37,7 +37,6 @@ sequenceDiagram
     O->>O: Link AnonymousVisitor → Contact
     O->>O: Convert events to timeline
 ```
-</Frame>
 
 ## What's Captured
 

@@ -15,13 +15,13 @@ Outlit connects all of these into a unified customer timeline.
 ## How Outlit Tracking Works
 
 ```mermaid
-%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#6366f1', 'primaryTextColor': '#fff', 'primaryBorderColor': '#4f46e5', 'lineColor': '#818cf8', 'secondaryColor': '#a5b4fc', 'tertiaryColor': '#e0e7ff', 'textColor': '#1e1b4b', 'nodeTextColor': '#1e1b4b' }}}%%
+%%{init: {'theme': 'dark', 'flowchart': {'nodeSpacing': 40, 'rankSpacing': 50, 'curve': 'basis', 'padding': 15}}}%%
 flowchart LR
-    A[Anonymous Visitor] -->|pageviews, forms| B[Visitor Record]
-    B -->|identify call| C[Known Contact]
-    C --> D[Customer Timeline]
-    E[Server Events] -->|email/userId| C
-    F[Billing Events] --> D
+    A([Anonymous Visitor]) -->|pageviews, forms| B([Visitor Record])
+    B -->|identify call| C([Known Contact])
+    C --> D([Customer Timeline])
+    E([Server Events]) -->|email/userId| C
+    F([Billing Events]) --> D
 ```
 
 ### Browser Tracking (Anonymous Phase)
