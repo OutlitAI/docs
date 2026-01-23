@@ -174,13 +174,24 @@ export function useOutlit() {
     outlit.track(eventName, properties)
   }
 
-  function identify(email: string, traits?: Record<string, any>) {
-    outlit.identify({ email, traits })
+  function identify(options: { email?: string; userId?: string; traits?: Record<string, any> }) {
+    outlit.identify(options)
+  }
+
+  function setUser(identity: { email?: string; userId?: string; traits?: Record<string, any> }) {
+    outlit.setUser(identity)
+  }
+
+  function clearUser() {
+    outlit.clearUser()
   }
 
   return {
     track,
-    identify
+    identify,
+    setUser,
+    clearUser,
+    user: outlit.user,
   }
 }
 ```
@@ -191,10 +202,24 @@ Use in components:
 <script setup>
 import { useOutlit } from '@/composables/useOutlit'
 
-const { track } = useOutlit()
+const { track, setUser, clearUser } = useOutlit()
 
 function handleFeatureClick() {
   track('feature_clicked', { feature: 'export' })
+}
+
+// After authentication
+function onLogin(user) {
+  setUser({
+    email: user.email,
+    userId: user.id,
+    traits: { name: user.name, plan: user.plan }
+  })
+}
+
+// On logout
+function onLogout() {
+  clearUser()
 }
 </script>
 ```
@@ -218,8 +243,8 @@ export const useUserStore = defineStore('user', {
       const user = await api.login(email, password)
       this.user = user
 
-      // Identify user after login
-      outlit.identify({
+      // Set user identity after login
+      outlit.setUser({
         email: user.email,
         userId: user.id,
         traits: {
@@ -236,6 +261,43 @@ export const useUserStore = defineStore('user', {
   }
 })
 ```
+
+## Auth Integration
+
+Sync user identity with your auth state using Vue's reactivity:
+
+```typescript
+// main.ts or App.vue
+import { watch } from 'vue'
+import outlit from '@outlit/browser'
+import { useAuthStore } from './stores/auth'
+
+const auth = useAuthStore()
+
+// Sync user identity with auth state
+watch(
+  () => auth.user,
+  (user) => {
+    if (user) {
+      outlit.setUser({
+        email: user.email,
+        userId: user.id,
+        traits: {
+          name: user.name,
+          plan: user.plan
+        }
+      })
+    } else {
+      outlit.clearUser()
+    }
+  },
+  { immediate: true }
+)
+```
+
+<Info>
+  Using `setUser()` with a watcher ensures the user identity is always in sync with your auth state, including handling page refreshes where the user is already logged in.
+</Info>
 
 ## SSR with Nuxt
 

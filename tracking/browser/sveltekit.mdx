@@ -293,7 +293,7 @@ Track contact lifecycle events:
 ```
 
 <Warning>
-  Stage methods (`activate`, `engaged`) require the user to be identified first.
+  Stage methods (`user.activate`, `user.engaged`) require the user to be identified first using `setUser()` or `identify()`.
 </Warning>
 
 <Info>
@@ -368,15 +368,16 @@ function createOutlitStore() {
     track: (eventName: string, properties?: Record<string, any>) => {
       outlit.track(eventName, properties)
     },
-    identify: (email: string, traits?: Record<string, any>) => {
-      outlit.identify({ email, traits })
+    identify: (options: { email?: string; userId?: string; traits?: Record<string, any> }) => {
+      outlit.identify(options)
     },
-    setUser: (identity: any) => {
+    setUser: (identity: { email?: string; userId?: string; traits?: Record<string, any> }) => {
       outlit.setUser(identity)
     },
     clearUser: () => {
       outlit.clearUser()
-    }
+    },
+    user: outlit.user,
   }
 }
 
