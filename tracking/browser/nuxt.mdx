@@ -103,8 +103,8 @@ export function useOutlit() {
     $outlit.track(eventName, properties)
   }
 
-  function identify(email: string, traits?: Record<string, any>) {
-    $outlit.identify({ email, traits })
+  function identify(options: { email?: string; userId?: string; traits?: Record<string, any> }) {
+    $outlit.identify(options)
   }
 
   function setUser(identity: { email?: string; userId?: string; traits?: Record<string, any> }) {
@@ -119,7 +119,8 @@ export function useOutlit() {
     track,
     identify,
     setUser,
-    clearUser
+    clearUser,
+    user: $outlit.user,
   }
 }
 ```
@@ -148,7 +149,7 @@ Identify users after authentication:
 
 ```vue
 <script setup>
-const { identify } = useOutlit()
+const { setUser } = useOutlit()
 const router = useRouter()
 
 async function handleLogin(email: string, password: string) {
@@ -157,9 +158,13 @@ async function handleLogin(email: string, password: string) {
     body: { email, password }
   })
 
-  identify(user.email, {
-    name: user.name,
-    plan: user.plan
+  setUser({
+    email: user.email,
+    userId: user.id,
+    traits: {
+      name: user.name,
+      plan: user.plan
+    }
   })
 
   router.push('/dashboard')
@@ -321,21 +326,25 @@ Track user lifecycle:
 
 ```vue
 <script setup>
-const { activate, paid } = useOutlit()
+const { user } = useOutlit()
 
 function handleOnboardingComplete() {
-  activate({ flow: 'onboarding', step: 'completed' })
+  user.activate({ flow: 'onboarding', step: 'completed' })
 }
 
-function handleSubscribe(plan: string, amount: number) {
-  paid({ plan, amount })
+function handleEngagementMilestone() {
+  user.engaged({ milestone: 'first_project' })
 }
 </script>
 ```
 
 <Warning>
-  Stage methods (`activate`, `engaged`, `paid`, `churned`) require the user to be identified first.
+  Stage methods (`user.activate`, `user.engaged`) require the user to be identified first using `setUser()` or `identify()`.
 </Warning>
+
+<Info>
+  Account billing (`paid`, `churned`, `trialing`) is tracked separately. If you've connected Stripe, billing is automatic. For manual billing, see [Stages & Billing](/tracking/stages).
+</Info>
 
 ## Consent Management
 

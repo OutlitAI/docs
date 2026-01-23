@@ -242,6 +242,56 @@ Identify users after authentication:
 </script>
 ```
 
+## Auth State Management
+
+For apps with authentication, use `setUser()` and `clearUser()` to sync user identity:
+
+```astro
+---
+// src/components/AuthObserver.astro
+---
+
+<script>
+  import outlit from '@outlit/browser'
+
+  // Check for existing auth session on page load
+  async function checkAuth() {
+    const response = await fetch('/api/auth/session')
+    const session = await response.json()
+
+    if (session?.user) {
+      outlit.setUser({
+        email: session.user.email,
+        userId: session.user.id,
+        traits: {
+          name: session.user.name,
+          plan: session.user.plan
+        }
+      })
+    }
+  }
+
+  checkAuth()
+
+  // Listen for auth state changes (e.g., from Supabase, Firebase)
+  window.addEventListener('auth-state-changed', (event) => {
+    const user = event.detail?.user
+    if (user) {
+      outlit.setUser({
+        email: user.email,
+        userId: user.id
+      })
+    } else {
+      outlit.clearUser()
+    }
+  })
+</script>
+```
+
+<Info>
+  Using `setUser()` ensures the user identity persists across page navigations and is properly set when users return to your site already logged in.
+</Info>
+
 ## View Transitions
 
 Track navigation with Astro's View Transitions:
@@ -374,6 +424,34 @@ const entry = await getEntry('blog', Astro.params.slug)
   })
 </script>
 ```
+
+## Contact Stage Events
+
+Track contact lifecycle events:
+
+```astro
+---
+// src/components/OnboardingComplete.astro
+---
+
+<button id="complete-onboarding">Complete Setup</button>
+
+<script>
+  import outlit from '@outlit/browser'
+
+  document.getElementById('complete-onboarding')?.addEventListener('click', () => {
+    outlit.user.activate({ flow: 'onboarding', step: 'completed' })
+  })
+</script>
+```
+
+<Warning>
+  Stage methods (`user.activate`, `user.engaged`) require the user to be identified first using `setUser()` or `identify()`.
+</Warning>
+
+<Info>
+  Account billing (`paid`, `churned`, `trialing`) is tracked separately. If you've connected Stripe, billing is automatic. For manual billing, see [Stages & Billing](/tracking/stages).
+</Info>
 
 ## Consent Management
 

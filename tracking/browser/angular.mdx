@@ -403,7 +403,7 @@ export class OnboardingComponent {
   ) {}
 
   handleComplete(): void {
-    outlit.user.activate({
+    this.outlit.activate({
       flow: 'onboarding',
       step: 'completed'
     })
@@ -414,7 +414,7 @@ export class OnboardingComponent {
 ```
 
 <Warning>
-  Stage methods (`activate`, `engaged`) require the user to be identified first.
+  Stage methods (`activate`, `engaged`) require the user to be identified first using `setUser()` or `identify()`.
 </Warning>
 
 <Info>
